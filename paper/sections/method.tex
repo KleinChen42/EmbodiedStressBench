@@ -1,0 +1,13 @@
+EmbodiedStressBench evaluates a pipeline as a mapping from a language query and RGB-D observations to an executable action target. Each episode is defined by a task, query, baseline target-source method, stressor group, stress level, and random seed.
+
+\subsection{Pipeline}
+The benchmark records observations, detections, predicted 3D targets, execution outcomes, and failure types. All outputs are saved as machine-readable JSON files.
+
+\subsection{Stressors}
+We categorize perturbations into semantic, visual, geometric, and execution stressors. Semantic stressors modify language queries. Visual stressors perturb the RGB-D observation. Geometric stressors perturb depth or camera pose. Execution stressors perturb the predicted target before execution.
+
+\subsection{Baselines}
+The starter framework includes oracle targets, box-center depth, crop-median depth, crop-top-surface depth, and a placeholder multi-view memory baseline.
+
+\subsection{Metrics}
+The main metrics are success rate, target error, valid-depth statistics, oracle gap, failure distribution, runtime, and robustness curves across increasing stress levels.

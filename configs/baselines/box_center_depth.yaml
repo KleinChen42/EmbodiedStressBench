@@ -1,0 +1,3 @@
+name: box_center_depth
+type: rgbd_crop
+notes: Uses detection box center pixel and depth back-projection.

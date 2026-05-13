@@ -1,0 +1,14 @@
+name: depth_noise
+levels:
+  0:
+    sigma: 0.0
+    missing_prob: 0.0
+  1:
+    sigma: 0.003
+    missing_prob: 0.02
+  2:
+    sigma: 0.008
+    missing_prob: 0.08
+  3:
+    sigma: 0.015
+    missing_prob: 0.15

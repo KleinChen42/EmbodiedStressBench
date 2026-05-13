@@ -1,0 +1,15 @@
+name: exp_tiny_mock
+description: Tiny mock matrix for verifying end-to-end logging and reporting.
+env_backend: mock
+tasks:
+  - PickCube
+  - StackCube
+baselines:
+  - oracle_target
+  - crop_median_depth
+stressors:
+  - none
+  - depth_noise
+levels: [0, 1]
+seeds: [0, 1, 2]
+default_query: "pick the red cube"

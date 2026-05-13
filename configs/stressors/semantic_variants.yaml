@@ -1,0 +1,17 @@
+name: semantic_variants
+levels:
+  0:
+    mode: clean
+  1:
+    mode: synonym
+  2:
+    mode: underspecified
+  3:
+    mode: distractor
+variants:
+  synonym:
+    "pick the red cube": "grasp the crimson block"
+  underspecified:
+    "pick the red cube": "pick the cube"
+  distractor:
+    "pick the red cube": "pick the cube near the green object"

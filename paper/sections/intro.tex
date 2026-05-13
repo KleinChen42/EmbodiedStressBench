@@ -1,0 +1,13 @@
+Language-conditioned manipulation has become a central problem in embodied AI. However, many evaluations emphasize clean-setting success rates, which can obscure the intermediate failure mechanisms that prevent a system from converting language and RGB-D observations into executable 3D action targets.
+
+This paper studies a diagnostic question: when a language-conditioned manipulation pipeline fails, does the failure originate from semantic retrieval, visual perception, RGB-D geometry, target-source selection, or execution fragility?
+
+We introduce EmbodiedStressBench, a simulation-based benchmark for controlled stress testing. The benchmark is designed for reproducible large-scale experiments and explicitly avoids requiring real robot hardware.
+
+Our intended contributions are:
+\begin{itemize}
+    \item a modular stress-testing framework for language-conditioned embodied manipulation pipelines;
+    \item a taxonomy of semantic, visual, geometric, and execution stressors;
+    \item structured failure logging and oracle-gap analysis for executable 3D target quality;
+    \item large-scale simulation evidence to be inserted after experiments are completed.
+\end{itemize}

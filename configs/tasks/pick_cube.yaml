@@ -1,0 +1,6 @@
+name: PickCube
+env_backend: mock
+query_templates:
+  - "pick the red cube"
+  - "grasp the cube"
+  - "pick up the target cube"

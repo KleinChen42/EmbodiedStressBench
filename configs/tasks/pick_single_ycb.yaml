@@ -1,0 +1,5 @@
+name: PickSingleYCB
+env_backend: mock
+query_templates:
+  - "pick the object"
+  - "grasp the target object"

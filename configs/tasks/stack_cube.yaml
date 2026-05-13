@@ -1,0 +1,5 @@
+name: StackCube
+env_backend: mock
+query_templates:
+  - "stack the red cube on the green cube"
+  - "place the cube on the reference cube"

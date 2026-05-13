@@ -1,0 +1,14 @@
+name: camera_pose_noise
+levels:
+  0:
+    translation_std: 0.0
+    rotation_deg_std: 0.0
+  1:
+    translation_std: 0.002
+    rotation_deg_std: 0.5
+  2:
+    translation_std: 0.005
+    rotation_deg_std: 1.5
+  3:
+    translation_std: 0.01
+    rotation_deg_std: 3.0

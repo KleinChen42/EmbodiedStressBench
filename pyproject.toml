@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "embodied-stressbench"
+version = "0.1.0"
+description = "AI-driven stress testing for language-conditioned embodied manipulation"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+  "numpy>=1.23",
+  "pyyaml>=6.0",
+  "pandas>=1.5",
+  "matplotlib>=3.7",
+  "tabulate>=0.9"
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0", "ruff>=0.1.0"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["embodied_stressbench*"]
+
+[tool.ruff]
+line-length = 100

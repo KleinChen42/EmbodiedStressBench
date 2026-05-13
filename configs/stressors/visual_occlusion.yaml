@@ -1,0 +1,10 @@
+name: visual_occlusion
+levels:
+  0:
+    occlusion_fraction: 0.0
+  1:
+    occlusion_fraction: 0.05
+  2:
+    occlusion_fraction: 0.15
+  3:
+    occlusion_fraction: 0.30

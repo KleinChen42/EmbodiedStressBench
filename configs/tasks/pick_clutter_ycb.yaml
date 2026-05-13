@@ -1,0 +1,5 @@
+name: PickClutterYCB
+env_backend: mock
+query_templates:
+  - "pick the requested object from clutter"
+  - "grasp the target object among distractors"

@@ -1,0 +1,25 @@
+name: exp_mvp_main
+description: First publishable-scale MVP matrix. Run only after smoke tests pass.
+env_backend: mock  # replace with maniskill after wrapper is verified
+tasks:
+  - PickCube
+  - StackCube
+  - PickSingleYCB
+baselines:
+  - oracle_target
+  - box_center_depth
+  - crop_median_depth
+  - crop_top_surface
+  - multiview_memory
+stressors:
+  - none
+  - semantic_variants
+  - depth_noise
+  - visual_occlusion
+  - camera_pose_noise
+  - execution_offset
+levels: [0, 1, 2, 3]
+seed_range:
+  start: 0
+  stop: 100
+default_query: "pick the red cube"
