@@ -104,7 +104,7 @@ def build_package(out_dir: Path) -> None:
 
 Repository: {REPO_URL}
 Release tag: {RELEASE_TAG}
-Commit hash: {_git_commit()}
+Version identifier: GitHub release tag `{RELEASE_TAG}`. The tag resolves to the exact archived commit.
 Zenodo DOI: {ZENODO_PLACEHOLDER}
 
 ## Contents
@@ -118,8 +118,8 @@ release limit.
 ## Submission Gate
 
 Before journal submission, create the public GitHub release `{RELEASE_TAG}`,
-archive it with Zenodo, and replace `{ZENODO_PLACEHOLDER}` in manuscript-facing
-metadata with the minted DOI.
+archive it with Zenodo, and replace `{ZENODO_PLACEHOLDER}` in release metadata
+with the minted DOI.
 """
     (out_dir / "CODE_DATA_RELEASE_METADATA.md").write_text(metadata, encoding="utf-8")
     rows.append(
