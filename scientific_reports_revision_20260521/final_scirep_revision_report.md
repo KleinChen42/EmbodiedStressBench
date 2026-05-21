@@ -71,6 +71,8 @@ Not supported yet:
 - Manuscript availability scan: no `[repository/DOI]`, `must not be treated`, or placeholder wording remains in the paper text.
 - LaTeX source audit: all `\input{}` files and citation keys resolve.
 - `git diff --check`: no whitespace errors; line-ending warnings only.
+- GitHub main branch and annotated release tag `v0.1.0-scirep` were pushed.
+- The release tag resolves to commit `1d4a8fb7ceeb6e79bd9ac480784b34416ef370bd`.
 - PDF build was not completed locally because `pdflatex`, `latexmk`, and
   `tectonic` are not installed, and Docker Desktop is present but its daemon is
   not running.
@@ -78,7 +80,9 @@ Not supported yet:
 ## Next Steps
 
 1. Compile and visually inspect the Scientific Reports PDF.
-2. Push the staged GitHub release `v0.1.0-scirep`, archive it with Zenodo, and
-   replace the release-package DOI placeholder with the minted DOI.
-3. Add the minted DOI to the Data and Code Availability sections.
-4. Revisit closed-loop calibration only after a scripted executor passes the oracle gate.
+2. Create the GitHub release from tag `v0.1.0-scirep` and upload
+   `scientific_reports_revision_20260521/release_package_v0.1.0-scirep.zip`.
+3. Archive the GitHub release with Zenodo and replace the release-package DOI
+   placeholder with the minted DOI.
+4. Add the minted DOI to the Data and Code Availability sections before submission.
+5. Revisit closed-loop calibration only after a scripted executor passes the oracle gate.
