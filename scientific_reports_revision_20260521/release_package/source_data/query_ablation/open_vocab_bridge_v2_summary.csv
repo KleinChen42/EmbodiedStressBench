@@ -1,0 +1,2 @@
+expected_episodes,completed_episodes,complete,duplicate_result_count,runner_exception_count,runner_exception_rate,no_detection_count,no_detection_rate,grounding_dino_rows,grounding_dino_rows_with_debug,ycb_or_clutter_generic_selected_label_rows,overall_success_rate
+3840,3840,True,0,0,0.0,0,0.0,1920,1920,3120,0.3619791666666667

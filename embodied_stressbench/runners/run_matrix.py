@@ -4,7 +4,7 @@ import argparse
 import traceback
 from itertools import product
 from pathlib import Path
-from typing import Iterable, List
+from typing import List
 
 from embodied_stressbench.runners.run_single import run_episode
 from embodied_stressbench.utils.io import append_jsonl, ensure_dir, load_yaml, save_json
@@ -19,10 +19,17 @@ def _seeds_from_config(cfg: dict) -> List[int]:
     return [0]
 
 
-def run_matrix(config_path: str | Path, output_dir: str | Path) -> None:
+def run_matrix(
+    config_path: str | Path,
+    output_dir: str | Path,
+    shard_index: int | None = None,
+    num_shards: int | None = None,
+    dry_run: bool = False,
+) -> None:
     cfg = load_yaml(config_path)
     out = ensure_dir(output_dir)
     summary_path = out / "summary.jsonl"
+    resume_root = out.parent if out.name.startswith("shard_") else out
 
     tasks = cfg.get("tasks", ["PickCube"])
     baselines = cfg.get("baselines", ["oracle_target"])
@@ -30,17 +37,62 @@ def run_matrix(config_path: str | Path, output_dir: str | Path) -> None:
     levels = [int(x) for x in cfg.get("levels", [0])]
     seeds = _seeds_from_config(cfg)
     backend = cfg.get("env_backend", "mock")
-    query = cfg.get("default_query", "pick the red cube")
+    default_query = cfg.get("default_query", "pick the red cube")
+    task_queries = cfg.get("task_queries", {}) or {}
+    query_variants = cfg.get("query_variants") or {}
+    if query_variants:
+        query_items = [(str(key), str(value)) for key, value in query_variants.items()]
+    else:
+        query_items = [("", "")]
 
-    total = len(tasks) * len(baselines) * len(stressors) * len(levels) * len(seeds)
-    save_json(out / "experiment_config_snapshot.json", cfg)
-    print(f"Running matrix: {total} episodes -> {out}")
+    combinations = list(product(tasks, baselines, stressors, levels, seeds, query_items))
+    full_total = len(combinations)
+    if (shard_index is None) != (num_shards is None):
+        raise ValueError("shard_index and num_shards must be provided together")
+    if shard_index is not None and num_shards is not None:
+        if num_shards <= 0:
+            raise ValueError("num_shards must be positive")
+        if shard_index < 0 or shard_index >= num_shards:
+            raise ValueError("shard_index must satisfy 0 <= shard_index < num_shards")
+        combinations = [
+            combo for idx, combo in enumerate(combinations) if idx % num_shards == shard_index
+        ]
+
+    snapshot = dict(cfg)
+    if shard_index is not None and num_shards is not None:
+        snapshot["shard"] = {
+            "shard_index": int(shard_index),
+            "num_shards": int(num_shards),
+            "full_total_episodes": int(full_total),
+            "shard_total_episodes": int(len(combinations)),
+        }
+    if dry_run:
+        print(f"Dry run: config={config_path}")
+        print(f"Dry run: output={out}")
+        print(f"Dry run: full_total_episodes={full_total}")
+        print(f"Dry run: selected_episodes={len(combinations)}")
+        if shard_index is not None and num_shards is not None:
+            print(f"Dry run: shard={shard_index}/{num_shards}")
+        return
+
+    existing_result_names = {
+        path.name
+        for path in resume_root.rglob("*.json")
+        if path.name != "experiment_config_snapshot.json"
+    }
+    save_json(out / "experiment_config_snapshot.json", snapshot)
+    shard_msg = "" if shard_index is None else f" shard={shard_index}/{num_shards}"
+    print(f"Running matrix{shard_msg}: {len(combinations)} episodes -> {out}")
 
     count = 0
-    for task, baseline, stressor, level, seed in product(tasks, baselines, stressors, levels, seeds):
+    total = len(combinations)
+    for task, baseline, stressor, level, seed, query_item in combinations:
         count += 1
-        result_file = out / f"{task}__{baseline}__{stressor}_L{level}__seed{seed}.json"
-        if result_file.exists():
+        query_key, query_template = query_item
+        query = query_template or task_queries.get(task, default_query)
+        query_part = "" if not query_key else f"__q-{query_key}"
+        result_file = out / f"{task}__{baseline}__{stressor}_L{level}__seed{seed}{query_part}.json"
+        if result_file.name in existing_result_names:
             print(f"[{count}/{total}] skip existing {result_file.name}")
             continue
         try:
@@ -53,6 +105,7 @@ def run_matrix(config_path: str | Path, output_dir: str | Path) -> None:
                 backend=backend,
                 stressor=stressor,
                 level=level,
+                query_variant=query_key or None,
             )
         except Exception as e:
             result = {
@@ -61,6 +114,8 @@ def run_matrix(config_path: str | Path, output_dir: str | Path) -> None:
                 "backend": backend,
                 "seed": int(seed),
                 "baseline": baseline,
+                "query_variant": query_key or None,
+                "query_template": query,
                 "stressor": stressor,
                 "level": int(level),
                 "success": False,
@@ -70,16 +125,27 @@ def run_matrix(config_path: str | Path, output_dir: str | Path) -> None:
                 "traceback": traceback.format_exc(),
             }
             save_json(result_file, result)
+        existing_result_names.add(result_file.name)
         append_jsonl(summary_path, result)
-        print(f"[{count}/{total}] {task} {baseline} {stressor} L{level} seed={seed} success={result.get('success')}")
+        query_msg = "" if not query_key else f" q={query_key}"
+        print(f"[{count}/{total}] {task} {baseline} {stressor} L{level} seed={seed}{query_msg} success={result.get('success')}")
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", required=True)
     parser.add_argument("--output", required=True)
+    parser.add_argument("--shard-index", type=int, default=None)
+    parser.add_argument("--num-shards", type=int, default=None)
+    parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
-    run_matrix(args.config, args.output)
+    run_matrix(
+        args.config,
+        args.output,
+        shard_index=args.shard_index,
+        num_shards=args.num_shards,
+        dry_run=args.dry_run,
+    )
 
 
 if __name__ == "__main__":

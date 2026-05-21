@@ -1,0 +1,7 @@
+target_error_bin,episodes,task_success_rate,diagnostic_success_rate
+0-0.04,20,0.1,1.0
+0.04-0.06,0,,
+0.06-0.08,0,,
+0.08-0.10,0,,
+0.10-0.15,0,,
+>0.15,0,,

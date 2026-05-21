@@ -1,0 +1,12 @@
+name: execution_offset_strong
+type: execution
+description: Apply stronger execution target perturbations than the standard execution_offset stressor.
+levels:
+  0:
+    offset_std: 0.0
+  1:
+    offset_std: 0.015
+  2:
+    offset_std: 0.035
+  3:
+    offset_std: 0.060

@@ -1,0 +1,26 @@
+name: weekend_main_v1_seed350_650
+description: Weekend held-out Main v1 extension for stronger statistical stability over seeds 350-649.
+env_backend: maniskill
+tasks:
+  - PickCube
+  - StackCube
+  - PickSingleYCB
+  - PickClutterYCB
+baselines:
+  - oracle_target
+  - box_center_depth
+  - crop_median_depth
+  - crop_top_surface
+stressors:
+  - none
+  - same_shape_distractor
+  - same_color_distractor
+  - nearby_distractor
+  - partial_target_occlusion
+  - depth_sparsity
+  - execution_offset_strong
+levels: [0, 1, 2, 3]
+seed_range:
+  start: 350
+  stop: 650
+default_query: "pick the target object"

@@ -1,0 +1,17 @@
+name: exp_maniskill_smoke
+description: Real ManiSkill smoke matrix for validating target-source diagnostics before larger runs.
+env_backend: maniskill
+tasks:
+  - PickCube
+  - StackCube
+baselines:
+  - oracle_target
+  - box_center_depth
+  - crop_median_depth
+  - crop_top_surface
+stressors:
+  - none
+  - depth_noise
+levels: [0, 1]
+seeds: [0, 1, 2, 3, 4]
+default_query: "pick the red cube"

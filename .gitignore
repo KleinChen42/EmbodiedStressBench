@@ -1,10 +1,15 @@
 .venv/
+.env.local
+.env.*.local
 __pycache__/
 *.pyc
 .pytest_cache/
+.pytest_tmp*/
 pytest-cache-files-*/
+ieee_access_revision_20260520/test_tmp_*/
 .ruff_cache/
 outputs/*
 !outputs/.gitkeep
+paper/ieee_access/build/
 *.log
 .DS_Store

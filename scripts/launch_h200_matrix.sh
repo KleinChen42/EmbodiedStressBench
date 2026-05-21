@@ -14,7 +14,7 @@ python -m embodied_stressbench.runners.run_matrix --config "$CONFIG" --output "$
 EOF
 chmod +x "$OUT/run.sh"
 
-setsid -f bash "$OUT/run.sh" >/dev/null 2>&1 < /dev/null
+setsid bash "$OUT/run.sh" >/dev/null 2>&1 < /dev/null &
 echo $! > "$OUT/pidfile"
 echo -e "timestamp\tstatus\tconfig\toutput" > "$OUT/status.tsv"
 echo -e "$(date -Iseconds)\tlaunched\t$CONFIG\t$OUT" >> "$OUT/status.tsv"

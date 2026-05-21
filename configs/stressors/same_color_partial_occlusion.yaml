@@ -1,0 +1,19 @@
+name: same_color_partial_occlusion
+description: Insert a same-color distractor ahead of the target detection and partially occlude the target crop.
+levels:
+  0:
+    bbox_shift_fraction: 0.0
+    occlusion_fraction: 0.0
+    inserted_before_target: true
+  1:
+    bbox_shift_fraction: 0.45
+    occlusion_fraction: 0.25
+    inserted_before_target: true
+  2:
+    bbox_shift_fraction: 0.80
+    occlusion_fraction: 0.50
+    inserted_before_target: true
+  3:
+    bbox_shift_fraction: 1.20
+    occlusion_fraction: 0.75
+    inserted_before_target: true

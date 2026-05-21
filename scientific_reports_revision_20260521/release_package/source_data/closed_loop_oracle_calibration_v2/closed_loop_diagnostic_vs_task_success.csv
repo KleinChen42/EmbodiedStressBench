@@ -1,0 +1,3 @@
+diagnostic_success,task_success,episodes,rate
+True,False,18,0.9
+True,True,2,0.1

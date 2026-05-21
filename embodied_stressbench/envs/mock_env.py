@@ -49,11 +49,17 @@ class MockManipulationEnv:
                 "label": "red cube",
                 "score": 0.95,
                 "bbox_xyxy": [x1, y1, x2, y2],
+                "is_target": True,
+                "distractor_type": None,
+                "query_aliases": ["red cube", "target object", "requested object"],
             }
         ]
         metadata = {
             "oracle_target_3d": self.oracle_target.tolist(),
             "task": self.task,
+            "target_label": "red cube",
+            "target_category": "cube",
+            "target_bbox_xyxy": [x1, y1, x2, y2],
         }
         return Observation(
             rgb=rgb,
@@ -78,3 +84,13 @@ class MockManipulationEnv:
             failure_type=None if success else "target_error_too_large",
             debug_info={"target_error_l2": error, "success_threshold": threshold},
         )
+
+    def execute_scripted_task(self, target_3d: np.ndarray | None, execution_offset: np.ndarray | None = None) -> ExecutionResult:
+        """Mock closed-loop proxy used only for CI of the sanity-runner plumbing."""
+        result = self.execute_pick(target_3d, execution_offset=execution_offset)
+        result.debug_info = {
+            **result.debug_info,
+            "scripted_executor": "mock_proxy",
+            "closed_loop_task_success": result.success,
+        }
+        return result

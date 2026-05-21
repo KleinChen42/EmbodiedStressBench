@@ -1,0 +1,16 @@
+name: depth_sparsity
+type: geometric
+description: Remove valid depth samples inside the target crop.
+levels:
+  0:
+    missing_prob: 0.0
+    target_crop_only: true
+  1:
+    missing_prob: 0.25
+    target_crop_only: true
+  2:
+    missing_prob: 0.50
+    target_crop_only: true
+  3:
+    missing_prob: 0.75
+    target_crop_only: true

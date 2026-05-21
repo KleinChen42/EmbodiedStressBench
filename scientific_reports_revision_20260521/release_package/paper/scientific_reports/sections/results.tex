@@ -1,0 +1,79 @@
+\subsection{Protocol and experimental design}
+
+Figure~\ref{fig:scirep-protocol} summarizes the diagnostic protocol. Each episode starts from a language query and a detector or selector, lifts the selected RGB-D evidence to a 3D target, applies a parameterized stressor, and records target error, success, oracle gap, and failure type. Table~\ref{tab:scirep-experiment-design} summarizes the evidence sets used in the manuscript; the full stressor-level definitions are provided as Supplementary Table S1. Detection-list semantic ambiguity stressors insert distractor detections before the target to test selector-order sensitivity. They should not be interpreted as physically inserted scene distractors unless a rendered scene explicitly shows one.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.95\linewidth]{figures/protocol_schematic.png}
+\caption{EmbodiedStressBench diagnostic protocol. The benchmark isolates query-conditioned 3D target localization before policy execution and records target-source, detector, stressor, oracle-gap, and failure-taxonomy outcomes.}
+\label{fig:scirep-protocol}
+\end{figure}
+
+\input{tables/experiment_design_summary}
+
+\subsection{Controlled stressors expose target-generation failures}
+
+The main diagnostic sweeps show large and stable target-source differences (Table~\ref{tab:main-results-with-ci}). The oracle target remains the feasibility reference, while box-center, crop-median, and crop-top-surface targets degrade differently under stress. These gaps support the interpretation that failures are produced by the target-generation stage rather than only by task infeasibility.
+
+\input{tables/main_results_with_ci}
+
+\subsection{Why oracle diagnostic success can be below one}
+
+The oracle target uses privileged simulator geometry, but it is not a mathematical guarantee of success under every diagnostic row. Oracle rows are evaluated with the same finite target-distance threshold and stressor protocol as non-oracle rows. Consequently, oracle diagnostic success can fall below one when hard stressors move the evaluated target, when projection or visibility artifacts affect the stored diagnostic target, or when the stressor intentionally audits downstream target-displacement tolerance. Table~\ref{tab:oracle-diagnostic-success} reports the observed oracle success rates and prevents the stronger but incorrect interpretation that oracle rows are forced to be perfect.
+
+\input{tables/oracle_diagnostic_success_summary}
+
+\subsection{Target sources show a precision--robustness tradeoff}
+
+The default success threshold is 0.08 m, but the stored target-error values allow the same results to be recomputed at stricter and more relaxed thresholds. Table~\ref{tab:threshold-sensitivity} shows that crop-median depth is strongest at the default and relaxed thresholds, whereas box-center depth is more precise under strict 0.04 m and 0.06 m thresholds. We therefore avoid the stronger claim that crop-median depth is universally best. The evidence supports a precision--robustness tradeoff: box-center depth tends to place targets tightly when localization is clean, while crop-median depth better tolerates mixed-depth crops at operational thresholds.
+
+\input{tables/threshold_sensitivity}
+
+\subsection{Open-vocabulary detector bridge exposes detector and adapter limitations}
+
+The detector bridge evaluates learned and controlled selectors through the same target-source interface. In Bridge v2, GroundingDINO produces usable detections but has lower diagnostic success than metadata query-aware selection, and its low 2D IoU does not imply absence of all useful 3D evidence. Diagnostic success is computed from lifted 3D target distance, so a detection box can fail a strict 2D IoU criterion while still preserving enough crop depth for a valid target in simple scenes.
+
+The YCB/clutter held-out extension gives the more important Scientific Reports result: GroundingDINO fails through no-detection under the generic target-object query, while metadata-assisted and first-detection controls remain executable (Table~\ref{tab:scirep-open-vocab-transfer}). This is written as a detector-query and adapter-label limitation in the benchmark, not as a general claim that GroundingDINO cannot localize YCB or clutter objects. The result strengthens the benchmark claim because the same artifact schema captures success, no-detection, wrong-detection, and target-error outcomes across controlled and learned selectors.
+
+\input{tables/open_vocab_detector_transfer_summary}
+
+We therefore ran a targeted query ablation on YCB/clutter to test whether the held-out failure was only a prompt artifact. The ablation completed 3,840 episodes without duplicate files or runner exceptions. It removes the previous no-detection mode, but GroundingDINO remains dominated by wrong-detection failures (Table~\ref{tab:scirep-query-ablation}). We also probed whether the ManiSkill adapter exposed true YCB object names for a stricter object-name prompt ablation. It did not: target labels remained generic in the current adapter (Table~\ref{tab:target-name-probe}). The query experiment therefore supports detector-query sensitivity and adapter-metadata limitations, rather than proving recovery with true object-name prompts.
+
+\input{tables/query_ablation_summary}
+
+\input{tables/target_name_probe_summary}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.95\linewidth]{figures/open_vocab_detector_transfer_success.png}
+\caption{Detector bridge diagnostic success by evidence set, detector, and target source. The YCB/clutter extension exposes a sharp transfer failure for the GroundingDINO query setup used in this study.}
+\label{fig:scirep-detector-success}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.95\linewidth]{figures/open_vocab_detector_transfer_no_detection.png}
+\caption{No-detection rates for the same detector bridge. The held-out YCB/clutter setting turns the learned-detector limitation into an explicit failure mode rather than hiding it inside aggregate success.}
+\label{fig:scirep-detector-no-detection}
+\end{figure}
+
+Figure~\ref{fig:scirep-qualitative-cases} shows representative ManiSkill qualitative cases selected from the same CSV/JSON records and re-rendered through the simulator. Each panel includes the RGB render, depth map, selected and oracle bounding boxes when available, query, seed, stressor, target source, target error, and failure label.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.95\linewidth]{figures/maniskill_qualitative_main_figure.png}
+\caption{ManiSkill RGB/depth qualitative panels selected from completed Bridge v2 and YCB/clutter held-out records. The main text shows four enlarged cases: clean success, wrong detection, no detection, and low-IoU but valid 3D target behavior. Additional rendered cases are provided with the source-data package.}
+\label{fig:scirep-qualitative-cases}
+\end{figure}
+
+\subsection{Closed-loop execution calibration remains unresolved}
+
+We attempted a scripted closed-loop oracle calibration to test whether diagnostic target success can be treated as a proxy for actual task success. The rescue gate completed without duplicate files and produced nonzero but still insufficient oracle task success for PickCube and PickSingleYCB (Table~\ref{tab:closed-loop-v2-gate}). This fails the pre-registered oracle gate. Consequently, the current manuscript does not claim that diagnostic target success predicts closed-loop task success. Instead, the result is used to define a limitation and a future calibration requirement.
+
+\input{tables/closed_loop_oracle_calibration_v2_gate}
+
+\subsection{Relationship to existing benchmarks}
+
+EmbodiedStressBench is complementary to existing simulation and manipulation benchmarks. Table~\ref{tab:benchmark-comparison} summarizes the distinction: the present study diagnoses language-to-target generation with stressor levels, oracle gaps, and failure labels, whereas standard manipulation benchmarks primarily evaluate policies or task completion.
+
+\input{tables/benchmark_comparison_table}

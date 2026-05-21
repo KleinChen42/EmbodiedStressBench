@@ -1,0 +1,5 @@
+run,oracle_episodes,oracle_success_rate,mean_target_error_l2
+HardL3,3600,0.8966666666666666,0.0
+Heldout,33600,0.9709523809523809,0.0
+Primary,11200,0.9717857142857143,0.0
+Semantic,22400,1.0,0.0

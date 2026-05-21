@@ -1,12 +1,16 @@
 # EmbodiedStressBench
 
-**AI-Driven Stress Testing for Language-Conditioned Embodied Manipulation**
+**A reproducible diagnostic benchmark for stress testing language-to-target generation in robotic manipulation**
 
-EmbodiedStressBench is a starter research codebase for building a publishable simulation-based benchmark and diagnostic framework. The project is designed for a setting with strong GPU compute, AI coding assistance, and no real robot hardware.
+EmbodiedStressBench is a simulation-based diagnostic benchmark for isolating
+failures in the language-query-to-3D-target stage of robotic manipulation
+pipelines. It evaluates how target selection, RGB-D target generation, visual
+and geometric corruptions, semantic distractors, and execution perturbations
+affect diagnostic manipulation success.
 
-Target paper direction:
+Current IEEE Access manuscript title:
 
-> EmbodiedStressBench: AI-Driven Stress Testing for Language-Conditioned Embodied Manipulation
+> EmbodiedStressBench: A Reproducible Diagnostic Benchmark for Stress Testing Language-to-Target Generation in Robotic Manipulation
 
 Target venue for the first version:
 
@@ -14,9 +18,35 @@ Target venue for the first version:
 
 Core thesis:
 
-> Current language-conditioned manipulation pipelines are often evaluated under clean success-rate settings. EmbodiedStressBench stress-tests these pipelines under semantic, visual, geometric, and execution perturbations, and diagnoses whether failures come from semantic retrieval, RGB-D target generation, multi-view association, or execution fragility.
+> Clean manipulation success can hide failures in the target-generation stage.
+> EmbodiedStressBench stress-tests this stage under semantic, visual,
+> geometric, and execution perturbations, then separates semantic selection,
+> RGB-D target generation, depth validity, and execution-tolerance failures
+> using oracle-gap and failure-taxonomy analyses.
 
-## What this starter includes
+## IEEE Access Manuscript Source
+
+The canonical submission source is:
+
+```text
+paper/ieee_access/main_revised.tex
+```
+
+Do not compile `paper/main.tex` for submission. It is a legacy guard that
+intentionally errors to prevent accidentally rebuilding the old experiment-log
+draft. To build the submission PDF when a LaTeX environment is available, run:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\build_ieee_access_pdf.ps1
+```
+
+Generated main-text tables live in `paper/ieee_access/tables/`. Oversized
+generated tables are moved to `paper/ieee_access/tables/supplement/` and can be
+compiled through `paper/ieee_access/supplementary_tables.tex`.
+The IEEE Access directory also includes `paper/ieee_access/references.bib`, so
+BibTeX should use `\bibliography{references}` from that manuscript directory.
+
+## What this repository includes
 
 - A reproducible Python package skeleton.
 - Config-driven experiment definitions.
@@ -38,7 +68,7 @@ Core thesis:
 - Report aggregation scripts.
 - Codex prompts for incremental development.
 - A 6-week project plan.
-- Paper skeleton in LaTeX.
+- IEEE Access manuscript source and generated analysis artifacts.
 
 ## Quick start
 
@@ -74,11 +104,54 @@ python -m embodied_stressbench.reporting.make_report \
   --output outputs/tiny_mock/report.md
 ```
 
+## H200 helper scripts
+
+This project includes self-contained H200 connection helpers under `scripts/`.
+They use the SSH key named `hd03-tenant13-research-20260405` from
+`$HOME/.ssh/` and read the key passphrase from either the current environment
+or a local `.env.local` file. Do not commit `.env.local`.
+
+Create a local secret file if desired:
+
+```powershell
+Copy-Item .env.local.example .env.local
+# edit .env.local and set SSH_KEY_PASSPHRASE
+```
+
+Check H200 status:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\h200_status.ps1
+```
+
+Run a read-only remote command:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\invoke_h200_command.ps1 `
+  -RemoteCommand "date && pwd && nvidia-smi --query-gpu=index,memory.used,utilization.gpu --format=csv,noheader"
+```
+
+Launch a remote script without blocking the local PowerShell session:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\h200_launch_detached.ps1 `
+  -RemoteScript outputs/my_launch.sh `
+  -RemoteDir /home/zetyun/OpenMythos_test
+```
+
+Sync lightweight files:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\sync_h200_files.ps1 `
+  -Direction push `
+  -Paths configs\experiments\exp_tiny_mock.yaml
+```
+
 ## Design principles
 
 1. **No fake results.** Every table and figure must come from JSON/JSONL outputs.
 2. **Simulation-first.** The starter runs in mock mode; ManiSkill/Isaac/LIBERO adapters can be added later.
-3. **Small-to-large scaling.** Run 1 seed → 5 seeds → 20 seeds → 100 seeds → full matrix.
+3. **Small-to-large scaling.** Run 1 seed -> 5 seeds -> 20 seeds -> 100 seeds -> full matrix.
 4. **Failure is data.** Crashes and failed episodes are recorded as structured results.
 5. **Codex-friendly.** Every module has simple interfaces and TODO blocks.
 6. **Paper-first engineering.** The code produces the artifacts needed for a journal paper.

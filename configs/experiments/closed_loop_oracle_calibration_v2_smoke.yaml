@@ -1,0 +1,25 @@
+name: closed_loop_oracle_calibration_v2_smoke
+env_backend: maniskill
+description: >
+  P0 oracle execution gate for Scientific Reports. This smoke uses privileged
+  oracle targets only; closed-loop calibration is claimable only if oracle task
+  success passes the configured PickCube and PickSingleYCB gates.
+tasks:
+  - PickCube
+  - PickSingleYCB
+default_query: "target object"
+task_queries:
+  PickCube: "red cube"
+  PickSingleYCB: "target object"
+baselines:
+  - oracle_target
+stressors:
+  - none
+levels: [0]
+seed_range:
+  start: 0
+  stop: 10
+expected_episodes: 20
+paper_use: >
+  If PickCube oracle task_success < 0.80 or PickSingleYCB oracle task_success
+  < 0.70, do not use closed-loop results for positive manuscript claims.

@@ -1,0 +1,25 @@
+name: open_vocab_grounding_dino_ieee_access_small_dino_first
+env_backend: maniskill
+description: >
+  Small GroundingDINO bridge matrix with learned-detector baselines first. This
+  avoids late lazy-import TLS conflicts observed when GroundingDINO is loaded
+  after many metadata-only ManiSkill episodes in the same worker process.
+tasks:
+  - PickCube
+default_query: "red cube"
+baselines:
+  - box_center_depth_grounding_dino
+  - crop_median_depth_grounding_dino
+  - oracle_target
+  - box_center_depth_query_aware
+  - crop_median_depth_query_aware
+stressors:
+  - visual_occlusion
+  - partial_target_occlusion
+  - depth_sparsity
+levels: [0, 1, 2, 3]
+seeds: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+expected_episodes: 1200
+detector_plugins:
+  - metadata_query_aware
+  - grounding_dino

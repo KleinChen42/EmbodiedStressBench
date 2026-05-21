@@ -1,0 +1,30 @@
+name: open_vocab_bridge_v2_smoke
+env_backend: maniskill
+description: >
+  Smoke gate for Open-Vocab Bridge v2. It checks task queries, GroundingDINO
+  detector initialization, the first-detection lower comparator, and the new
+  trimmed-median RGB-D target source before the full 13,500-episode run.
+tasks:
+  - PickCube
+  - PickSingleYCB
+  - PickClutterYCB
+default_query: "target object"
+task_queries:
+  PickCube: "red cube"
+  PickSingleYCB: "target object"
+  PickClutterYCB: "target object"
+baselines:
+  - crop_trimmed_median_depth_grounding_dino
+  - oracle_target
+  - crop_trimmed_median_depth_query_aware
+  - crop_trimmed_median_depth_first_detection
+stressors:
+  - same_shape_distractor
+  - partial_target_occlusion
+levels: [0, 3]
+seeds: [0, 1, 2]
+expected_episodes: 144
+detector_plugins:
+  - metadata_query_aware
+  - first_detection
+  - grounding_dino

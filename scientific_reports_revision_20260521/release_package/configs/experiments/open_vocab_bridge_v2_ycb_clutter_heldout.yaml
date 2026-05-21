@@ -1,0 +1,34 @@
+name: open_vocab_bridge_v2_ycb_clutter_heldout
+env_backend: maniskill
+description: >
+  Held-out YCB/clutter open-vocabulary bridge fallback for Scientific Reports.
+  Use only if the scripted closed-loop sanity gate is unstable.
+tasks:
+  - PickSingleYCB
+  - PickClutterYCB
+default_query: "target object"
+task_queries:
+  PickSingleYCB: "target object"
+  PickClutterYCB: "target object"
+baselines:
+  - oracle_target
+  - box_center_depth_query_aware
+  - box_center_depth_first_detection
+  - box_center_depth_grounding_dino
+  - crop_median_depth_query_aware
+  - crop_median_depth_first_detection
+  - crop_median_depth_grounding_dino
+  - crop_trimmed_median_depth_query_aware
+  - crop_trimmed_median_depth_first_detection
+  - crop_trimmed_median_depth_grounding_dino
+stressors:
+  - same_color_distractor
+  - same_shape_distractor
+  - nearby_distractor
+  - partial_target_occlusion
+  - depth_sparsity
+levels: [0, 2, 3]
+seed_range:
+  start: 30
+  stop: 90
+expected_episodes: 18000

@@ -3,7 +3,12 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from embodied_stressbench.metrics.aggregation import aggregate_success, load_results
+from embodied_stressbench.metrics.aggregation import (
+    aggregate_oracle_gap,
+    aggregate_success,
+    aggregate_summary,
+    load_results,
+)
 from embodied_stressbench.utils.io import ensure_dir
 
 
@@ -41,6 +46,10 @@ def make_report(input_dir: str | Path, output_path: str | Path) -> None:
     agg = aggregate_success(df)
     csv_path = out_path.parent / "success_by_group.csv"
     agg.to_csv(csv_path, index=False)
+    gap = aggregate_oracle_gap(df)
+    gap_csv_path = out_path.parent / "oracle_gap_by_group.csv"
+    if not gap.empty:
+        gap.to_csv(gap_csv_path, index=False)
 
     lines = []
     lines.append("# EmbodiedStressBench Report")
@@ -56,6 +65,28 @@ def make_report(input_dir: str | Path, output_path: str | Path) -> None:
     lines.append("")
     lines.append(_to_markdown_fallback(agg))
     lines.append("")
+    lines.append("## Baseline summary")
+    lines.append("")
+    lines.append(_to_markdown_fallback(aggregate_summary(df, ["baseline"])))
+    lines.append("")
+    lines.append("## Task / baseline summary")
+    lines.append("")
+    lines.append(_to_markdown_fallback(aggregate_summary(df, ["task", "baseline"])))
+    lines.append("")
+    lines.append("## Stressor summary")
+    lines.append("")
+    lines.append(_to_markdown_fallback(aggregate_summary(df, ["stressor"])))
+    lines.append("")
+    if "level" in df.columns and not df[df["level"] == 3].empty:
+        lines.append("## Level-3 stressor summary")
+        lines.append("")
+        lines.append(_to_markdown_fallback(aggregate_summary(df[df["level"] == 3], ["stressor"])))
+        lines.append("")
+    if not gap.empty:
+        lines.append("## Oracle gap by group")
+        lines.append("")
+        lines.append(_to_markdown_fallback(gap))
+        lines.append("")
     lines.append("## Failure distribution")
     lines.append("")
     if "failure_type" in df.columns:
@@ -64,6 +95,8 @@ def make_report(input_dir: str | Path, output_path: str | Path) -> None:
         lines.append(_to_markdown_fallback(failure_counts))
     lines.append("")
     lines.append(f"CSV table saved to `{csv_path}`.")
+    if not gap.empty:
+        lines.append(f"Oracle-gap CSV table saved to `{gap_csv_path}`.")
     out_path.write_text("\n".join(lines), encoding="utf-8")
 
 

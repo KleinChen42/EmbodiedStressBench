@@ -1,0 +1,16 @@
+name: main_v1_ieee_access_smoke
+description: Smoke gate for Main Experiment v1 before launching the full H200 run.
+env_backend: maniskill
+tasks:
+  - PickSingleYCB
+  - PickClutterYCB
+baselines:
+  - oracle_target
+  - box_center_depth
+  - crop_median_depth
+stressors:
+  - nearby_distractor
+  - partial_target_occlusion
+levels: [0, 1]
+seeds: [0, 1, 2, 3, 4]
+default_query: "pick the target object"

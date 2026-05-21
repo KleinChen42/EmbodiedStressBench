@@ -1,0 +1,28 @@
+name: closed_loop_calibration_heldout_no_stackcube
+env_backend: maniskill
+description: >
+  Held-out scripted closed-loop calibration extension for Scientific Reports.
+  This is a diagnostic metric calibration experiment, not a learned policy
+  benchmark. StackCube is excluded unless the sanity gate supports it.
+tasks:
+  - PickCube
+  - PickSingleYCB
+default_query: "target object"
+task_queries:
+  PickCube: "red cube"
+  PickSingleYCB: "target object"
+baselines:
+  - oracle_target
+  - box_center_depth
+  - crop_median_depth
+  - crop_trimmed_median_depth
+stressors:
+  - none
+  - depth_sparsity
+  - partial_target_occlusion
+  - execution_offset
+levels: [0, 3]
+seed_range:
+  start: 50
+  stop: 150
+expected_episodes: 6400

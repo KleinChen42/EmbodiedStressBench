@@ -1,0 +1,23 @@
+name: weekend_visual_sensor_bridge_seed350_500
+description: Weekend bridge run covering legacy visual, sensor, camera, and execution perturbations over seeds 350-499.
+env_backend: maniskill
+tasks:
+  - PickCube
+  - StackCube
+  - PickSingleYCB
+  - PickClutterYCB
+baselines:
+  - oracle_target
+  - box_center_depth
+  - crop_median_depth
+  - crop_top_surface
+stressors:
+  - visual_occlusion
+  - camera_pose_noise
+  - depth_noise
+  - execution_offset
+levels: [0, 1, 2, 3]
+seed_range:
+  start: 350
+  stop: 500
+default_query: "pick the target object"

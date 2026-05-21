@@ -1,0 +1,21 @@
+name: closed_loop_sanity_smoke
+env_backend: maniskill
+description: >
+  Smoke gate for the scripted closed-loop sanity subset. Results are a
+  diagnostic engineering sanity check, not a learned policy benchmark.
+tasks:
+  - PickCube
+  - PickSingleYCB
+default_query: "target object"
+task_queries:
+  PickCube: "red cube"
+  PickSingleYCB: "target object"
+baselines:
+  - oracle_target
+  - crop_median_depth
+stressors:
+  - none
+  - partial_target_occlusion
+levels: [0, 3]
+seeds: [0, 1, 2, 3, 4]
+expected_episodes: 80

@@ -1,0 +1,16 @@
+name: partial_target_occlusion
+type: visual
+description: Occlude only the target crop, leaving the rest of the image unchanged.
+levels:
+  0:
+    occlusion_fraction: 0.0
+    target_crop_only: true
+  1:
+    occlusion_fraction: 0.25
+    target_crop_only: true
+  2:
+    occlusion_fraction: 0.50
+    target_crop_only: true
+  3:
+    occlusion_fraction: 0.75
+    target_crop_only: true

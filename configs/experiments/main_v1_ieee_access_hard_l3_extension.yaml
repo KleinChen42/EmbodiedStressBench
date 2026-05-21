@@ -1,0 +1,25 @@
+name: main_v1_ieee_access_hard_l3_extension
+description: Focused level-3 extension for the most diagnostic Main v1 stressors using held-out seeds.
+env_backend: maniskill
+tasks:
+  - PickCube
+  - StackCube
+  - PickSingleYCB
+  - PickClutterYCB
+baselines:
+  - oracle_target
+  - box_center_depth
+  - crop_median_depth
+  - crop_top_surface
+stressors:
+  - same_shape_distractor
+  - same_color_distractor
+  - nearby_distractor
+  - partial_target_occlusion
+  - depth_sparsity
+  - execution_offset_strong
+levels: [3]
+seed_range:
+  start: 150
+  stop: 350
+default_query: "pick the target object"

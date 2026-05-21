@@ -1,0 +1,3 @@
+task,oracle_episodes,oracle_task_success_rate,passes_pickcube_gate_080,passes_picksingleycb_gate_070,passes_stackcube_gate_080
+PickCube,10,0.1,False,,
+PickSingleYCB,10,0.1,,False,

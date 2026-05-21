@@ -1,0 +1,27 @@
+name: open_vocab_smoke
+env_backend: maniskill
+description: >
+  Smoke matrix for optional open-vocabulary detector plug-ins. This config is
+  not part of the completed IEEE Access result set until the CLIP crop-reranker
+  is installed, run, and reported from generated artifacts.
+tasks:
+  - PickCube
+  - PickSingleYCB
+default_query: "pick the target object"
+baselines:
+  - box_center_depth_query_aware
+  - crop_median_depth_query_aware
+  - box_center_depth_first_detection
+  - crop_median_depth_first_detection
+  - box_center_depth_clip_rerank
+  - crop_median_depth_clip_rerank
+stressors:
+  - same_color_distractor
+  - nearby_distractor
+levels: [0, 1]
+seeds: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+expected_episodes: 480
+detector_plugins:
+  - metadata_query_aware
+  - first_detection
+  - clip_rerank

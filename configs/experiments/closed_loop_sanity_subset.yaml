@@ -1,0 +1,29 @@
+name: closed_loop_sanity_subset
+env_backend: maniskill
+description: >
+  Scripted executor sanity subset for comparing diagnostic target success with
+  actual task success. This is not a learned closed-loop policy benchmark.
+tasks:
+  - PickCube
+  - StackCube
+  - PickSingleYCB
+default_query: "target object"
+task_queries:
+  PickCube: "red cube"
+  StackCube: "red cube"
+  PickSingleYCB: "target object"
+baselines:
+  - oracle_target
+  - box_center_depth
+  - crop_median_depth
+  - crop_trimmed_median_depth
+stressors:
+  - none
+  - depth_sparsity
+  - partial_target_occlusion
+  - execution_offset
+levels: [0, 3]
+seed_range:
+  start: 0
+  stop: 50
+expected_episodes: 4800

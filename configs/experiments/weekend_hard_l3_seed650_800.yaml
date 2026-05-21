@@ -1,0 +1,25 @@
+name: weekend_hard_l3_seed650_800
+description: Weekend hard level-3 confirmation for the most diagnostic Main v1 stressors over seeds 650-799.
+env_backend: maniskill
+tasks:
+  - PickCube
+  - StackCube
+  - PickSingleYCB
+  - PickClutterYCB
+baselines:
+  - oracle_target
+  - box_center_depth
+  - crop_median_depth
+  - crop_top_surface
+stressors:
+  - same_shape_distractor
+  - same_color_distractor
+  - nearby_distractor
+  - partial_target_occlusion
+  - depth_sparsity
+  - execution_offset_strong
+levels: [3]
+seed_range:
+  start: 650
+  stop: 800
+default_query: "pick the target object"

@@ -1,0 +1,23 @@
+name: exp_maniskill_pilot
+description: First multi-stressor ManiSkill pilot for paper tables; run sharded on H200 GPUs 1-7.
+env_backend: maniskill
+tasks:
+  - PickCube
+  - StackCube
+baselines:
+  - oracle_target
+  - box_center_depth
+  - crop_median_depth
+  - crop_top_surface
+stressors:
+  - none
+  - semantic_variants
+  - depth_noise
+  - visual_occlusion
+  - camera_pose_noise
+  - execution_offset
+levels: [0, 1, 2, 3]
+seed_range:
+  start: 0
+  stop: 20
+default_query: "pick the red cube"

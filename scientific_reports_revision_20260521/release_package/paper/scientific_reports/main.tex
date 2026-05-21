@@ -1,0 +1,63 @@
+\documentclass[10pt]{article}
+\usepackage[a4paper,margin=0.78in]{geometry}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage[numbers,sort&compress]{natbib}
+
+\makeatletter
+\IfFileExists{sections/introduction.tex}
+  {\newcommand{\srroot}{.}}
+  {\IfFileExists{scientific_reports/sections/introduction.tex}
+    {\newcommand{\srroot}{scientific_reports}}
+    {\newcommand{\srroot}{paper/scientific_reports}}}
+\def\input@path{{\srroot/}{\srroot/sections/}{\srroot/tables/}}
+\makeatother
+\graphicspath{{\srroot/}{\srroot/figures/}}
+
+\title{EmbodiedStressBench: A Reproducible Simulation Diagnostic for Query-Conditioned 3D Target Localization in Robotic Manipulation}
+\author{Zhuo Chen\\EmbodiedStressBench Project\\Correspondence: author email to be finalized before submission}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Language-conditioned manipulation systems often hide target-generation failures behind aggregate task success. We present EmbodiedStressBench, a reproducible simulation study for stress-testing the language-query-to-3D-target stage of robotic manipulation. The study separates target selection, RGB-D target lifting, detection-list semantic ambiguity, depth and occlusion corruption, and target-displacement tolerance through parameterized stressors, per-episode artifacts, oracle-gap analysis, and a failure taxonomy. Across large-scale ManiSkill diagnostic sweeps, target sources show a precision--robustness tradeoff: box-center depth is more precise under strict distance thresholds, while crop-median depth is stronger at the default and relaxed thresholds. A learned-detector bridge shows that open-vocabulary detectors can be evaluated through the same protocol, and YCB/clutter query checks expose detector and adapter-label limitations without relying on positive closed-loop task-success claims. A scripted closed-loop smoke test did not pass the oracle execution gate, so execution calibration is treated as an unresolved limitation rather than a positive claim. EmbodiedStressBench is therefore positioned as a detector-agnostic diagnostic substrate for reproducible query-conditioned 3D target-localization failure analysis, not as a new closed-loop policy benchmark or real-robot system.
+\end{abstract}
+
+\section{Introduction}
+\input{\srroot/sections/introduction}
+
+\section{Related Work}
+\input{\srroot/sections/related_work}
+
+\section{Results}
+\input{\srroot/sections/results}
+
+\section{Discussion}
+\input{\srroot/sections/discussion}
+
+\section{Methods}
+\input{\srroot/sections/methods}
+
+\section{Data Availability}
+\input{\srroot/sections/data_availability}
+
+\section{Code Availability}
+\input{\srroot/sections/code_availability}
+
+\section{Author Contributions}
+Z.C. designed the benchmark, implemented the experiments, analyzed the data, and wrote the manuscript draft.
+
+\section{Competing Interests}
+The author declares no competing interests.
+
+\section{Acknowledgements}
+Funding and institutional acknowledgements should be finalized by the author before submission.
+
+\bibliographystyle{unsrtnat}
+\bibliography{\srroot/references}
+
+\end{document}

@@ -1,0 +1,34 @@
+name: open_vocab_true_name_query_ablation_ycb_clutter
+env_backend: maniskill
+description: >
+  Conditional Scientific Reports ablation. Run only if the target-name probe
+  confirms that ManiSkill exposes non-generic YCB target labels. Otherwise keep
+  the existing generic-query ablation as an adapter-metadata limitation.
+tasks:
+  - PickSingleYCB
+  - PickClutterYCB
+default_query: "target object"
+query_variants:
+  generic: "target object"
+  object_name: "{target_label}"
+  category: "{target_category}"
+  name_phrase: "the {target_label}"
+baselines:
+  - crop_median_depth_grounding_dino
+  - crop_trimmed_median_depth_grounding_dino
+  - crop_median_depth_query_aware
+  - crop_trimmed_median_depth_query_aware
+stressors:
+  - same_color_distractor
+  - same_shape_distractor
+  - partial_target_occlusion
+  - depth_sparsity
+levels: [0, 3]
+seed_range:
+  start: 105
+  stop: 125
+expected_episodes: 5120
+paper_use: >
+  Report as true object-name prompting only if actual query strings contain
+  non-generic YCB names. If queries collapse to target object/object, do not
+  use this as detector-query recovery evidence.

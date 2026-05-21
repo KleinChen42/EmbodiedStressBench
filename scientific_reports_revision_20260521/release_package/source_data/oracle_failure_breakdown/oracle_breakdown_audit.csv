@@ -1,0 +1,5 @@
+run,root,json_files,oracle_rows,read_errors,duplicate_result_count
+Primary,/data/openMythosBench_project/outputs/main_v1_ieee_access_20260514_full,44800,11200,0,0
+Heldout,/data/openMythosBench_project/outputs/weekend_main_v1_seed350_650_20260516,134400,33600,0,0
+HardL3,/data/openMythosBench_project/outputs/weekend_hard_l3_seed650_800_20260516,14400,3600,0,0
+Semantic,/data/openMythosBench_project/outputs/semantic_distractor_validity_v1_20260518,156800,22400,0,0

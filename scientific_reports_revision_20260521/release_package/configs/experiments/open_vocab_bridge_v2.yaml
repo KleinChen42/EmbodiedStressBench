@@ -1,0 +1,43 @@
+name: open_vocab_bridge_v2
+env_backend: maniskill
+description: >
+  Open-Vocab Bridge v2 for IEEE Access revision. GroundingDINO is evaluated
+  against metadata query-aware upper comparators and first-detection lower
+  comparators across cube, YCB, and clutter tasks. YCB queries remain generic
+  unless the backend exposes specific target labels; claims should be scoped
+  accordingly.
+tasks:
+  - PickCube
+  - PickSingleYCB
+  - PickClutterYCB
+default_query: "target object"
+task_queries:
+  PickCube: "red cube"
+  PickSingleYCB: "target object"
+  PickClutterYCB: "target object"
+baselines:
+  - box_center_depth_grounding_dino
+  - crop_median_depth_grounding_dino
+  - crop_trimmed_median_depth_grounding_dino
+  - oracle_target
+  - box_center_depth_query_aware
+  - crop_median_depth_query_aware
+  - crop_trimmed_median_depth_query_aware
+  - box_center_depth_first_detection
+  - crop_median_depth_first_detection
+  - crop_trimmed_median_depth_first_detection
+stressors:
+  - same_color_distractor
+  - same_shape_distractor
+  - nearby_distractor
+  - partial_target_occlusion
+  - depth_sparsity
+levels: [0, 2, 3]
+seed_range:
+  start: 0
+  stop: 30
+expected_episodes: 13500
+detector_plugins:
+  - metadata_query_aware
+  - first_detection
+  - grounding_dino

@@ -1,0 +1,9 @@
+query_variant,query_variant_display,query_template,actual_query,detector,detector_display,episodes,success_rate,success_ci_low,success_ci_high,wrong_detection_rate,wrong_detection_ci_low,wrong_detection_ci_high,iou_hit_025
+generic,Generic,target object,target object,GroundingDINO,GroundingDINO,240,0.025,0.0,0.075,0.9583333333333334,0.8791666666666667,1.0,0.041666666666666664
+generic,Generic,target object,target object,metadata query-aware,Metadata query-aware,240,0.7458333333333333,0.5666666666666667,0.8958333333333334,0.0,0.0,0.0,0.0
+object_label,Object-label template,{target_label},target object,GroundingDINO,GroundingDINO,240,0.025,0.0,0.075,0.9583333333333334,0.8791666666666667,1.0,0.041666666666666664
+object_label,Object-label template,{target_label},target object,metadata query-aware,Metadata query-aware,240,0.7458333333333333,0.5666666666666667,0.8958333333333334,0.0,0.0,0.0,0.0
+category,Category template,{target_category},object,GroundingDINO,GroundingDINO,240,0.029166666666666667,0.0,0.0875,0.9625,0.8875,1.0,0.03333333333333333
+category,Category template,{target_category},object,metadata query-aware,Metadata query-aware,240,0.5541666666666667,0.43333333333333335,0.6583333333333333,0.30833333333333335,0.26666666666666666,0.36666666666666664,0.0
+label_phrase,Label phrase,the {target_label},the target object,GroundingDINO,GroundingDINO,240,0.025,0.0,0.075,0.9458333333333333,0.8625,0.9916666666666667,0.05416666666666667
+label_phrase,Label phrase,the {target_label},the target object,metadata query-aware,Metadata query-aware,240,0.7458333333333333,0.5666666666666667,0.8958333333333334,0.0,0.0,0.0,0.0
