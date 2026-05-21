@@ -72,7 +72,7 @@ Not supported yet:
 - LaTeX source audit: all `\input{}` files and citation keys resolve.
 - `git diff --check`: no whitespace errors; line-ending warnings only.
 - GitHub main branch and annotated release tag `v0.1.0-scirep` were pushed.
-- The release tag resolves to commit `1d4a8fb7ceeb6e79bd9ac480784b34416ef370bd`.
+- The release tag resolves to the exact archived commit for the submitted source package.
 - PDF build was not completed locally because `pdflatex`, `latexmk`, and
   `tectonic` are not installed, and Docker Desktop is present but its daemon is
   not running.
