@@ -1,13 +1,25 @@
 \documentclass[10pt]{article}
-\usepackage[a4paper,margin=0.8in]{geometry}
+\usepackage[a4paper,margin=0.65in]{geometry}
+\usepackage{array}
 \usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage[numbers,sort&compress]{natbib}
+
+\title{Supplementary Information for\\
+A reproducible diagnostic benchmark for language-to-target generation in robotic manipulation}
+\author{Zhuo Chen}
+\date{}
 
 \begin{document}
+\maketitle
 
-\section*{Supplementary Tables}
+\section*{Supplementary Tables S1--S14}
+
+This file provides the supplementary tables cited by the main manuscript. A companion editable workbook, \texttt{supplementary\_tables\_S1\_S14.xlsx}, contains the same table set as one sheet per supplementary table.
 
 \setcounter{table}{0}
 \renewcommand{\thetable}{S\arabic{table}}
+\renewcommand{\arraystretch}{1.08}
 
 \input{tables/stressor_parameter_table}
 
@@ -37,6 +49,7 @@
 
 \input{tables/external_rgbd_detector_threshold_sensitivity}
 
-\input{tables/closed_loop_smoke_outcome}
+\bibliographystyle{unsrtnat}
+\bibliography{references}
 
 \end{document}

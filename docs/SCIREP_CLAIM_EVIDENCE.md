@@ -4,7 +4,7 @@ This document is the canonical claim-evidence audit for the submitted
 Scientific Reports package. Older submission-format and operational experiment logs
 are historical notes and are not part of the submitted claim wording.
 
-Release DOI: 10.5281/zenodo.20351628  
+Release DOI: 10.5281/zenodo.20352155
 Release tag: v0.1.0-scirep  
 Release commit: resolved by GitHub tag `v0.1.0-scirep`
 

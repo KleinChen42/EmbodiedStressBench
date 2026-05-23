@@ -24,7 +24,7 @@ v0.1.0-scirep
 Zenodo DOI:
 
 ```text
-10.5281/zenodo.20351628
+10.5281/zenodo.20352155
 ```
 
 ## Canonical Manuscript Source
@@ -52,6 +52,7 @@ It contains:
 - Scientific Reports manuscript source.
 - Processed CSV files for manuscript tables.
 - Figure source-data CSV files.
+- Supplementary Tables S1--S14 as both LaTeX source and an editable Excel workbook.
 - Generated figures used by the manuscript.
 - Configs for the completed evidence-producing runs.
 - JSON schema, checksums, license, citation metadata, and reproducibility notes.
@@ -110,7 +111,7 @@ python scripts/analyze_ycbv_external_rgbd_probe.py --help
 | Figure 4 external RGB-D validation | `external_rgbd_validation_source.csv` | `scripts/generate_scirep_external_rgbd_assets.py` |
 | Figure 5 qualitative panels | `qualitative_case_manifest.csv` | `scripts/generate_scirep_revision_assets.py` |
 | Table 3 execution audit | `closed_loop_oracle_calibration_v2_gate.csv` | `scripts/generate_scirep_revision_assets.py` |
-| Supplementary tables | `paper/scientific_reports/tables/*.csv` | `scripts/generate_scirep_revision_assets.py` and external RGB-D scripts |
+| Supplementary Tables S1--S14 | `paper/scientific_reports/supplementary_tables.tex`, `paper/scientific_reports/supplementary_tables_S1_S14.xlsx`, and `paper/scientific_reports/supplementary_tables_manifest.csv` | `scripts/build_scirep_supplementary_tables_workbook.py` plus the table-generation scripts |
 
 ## Regenerating Scientific Reports Tables And Figures
 
@@ -151,7 +152,7 @@ explicitly marked as a limitation.
 Before submitting to Scientific Reports:
 
 1. Confirm GitHub release tag `v0.1.0-scirep` resolves to the archived release.
-2. Confirm Zenodo DOI `10.5281/zenodo.20351628` resolves to the release archive.
+2. Confirm Zenodo DOI `10.5281/zenodo.20352155` resolves to the release archive.
 3. Compile and visually inspect the PDF.
 4. Confirm the PDF has no old title, internal GPU/path wording, or unsupported
    execution/manipulation claims.

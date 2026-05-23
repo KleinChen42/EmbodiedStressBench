@@ -11,7 +11,7 @@ from pathlib import Path
 
 REPO_URL = "https://github.com/KleinChen42/EmbodiedStressBench.git"
 RELEASE_TAG = "v0.1.0-scirep"
-ZENODO_VERSION_DOI = "10.5281/zenodo.20351628"
+ZENODO_VERSION_DOI = "10.5281/zenodo.20352155"
 ZENODO_CONCEPT_DOI = "10.5281/zenodo.20351620"
 LICENSE_NAME = "MIT"
 
@@ -196,10 +196,20 @@ def build_package(out_dir: Path) -> None:
     for ext in ("*.png", "*.pdf", "*.svg"):
         _copy_glob(Path("paper/scientific_reports/figures"), ext, out_dir / "figures", rows, "figure")
     _copy_glob(Path("paper/scientific_reports/figures"), "*.csv", out_dir / "source_data/figures", rows, "figure source data")
-    _copy_glob(Path("paper/scientific_reports/tables"), "*.tex", out_dir / "paper_tables", rows, "paper table")
+    _copy_glob(
+        Path("paper/scientific_reports/tables"),
+        "*.tex",
+        out_dir / "paper_tables",
+        rows,
+        "paper table",
+        skip_names=("closed_loop_smoke_outcome.tex",),
+    )
     for path in [
         "paper/scientific_reports/main.tex",
         "paper/scientific_reports/supplementary_tables.tex",
+        "paper/scientific_reports/supplementary_tables_S1_S14.xlsx",
+        "paper/scientific_reports/supplementary_tables_manifest.csv",
+        "paper/scientific_reports/supplementary_tables_manifest.md",
         "paper/scientific_reports/references.bib",
     ]:
         _copy_file(Path(path), out_dir / path, rows, "manuscript")
@@ -226,6 +236,7 @@ def build_package(out_dir: Path) -> None:
         "scripts/analyze_oracle_failure_breakdown.py",
         "scripts/analyze_ycbv_external_rgbd_probe.py",
         "scripts/run_ycbv_external_rgbd_probe.py",
+        "scripts/build_scirep_supplementary_tables_workbook.py",
     ]:
         _copy_file(Path(script), out_dir / script, rows, "script")
 
@@ -241,7 +252,8 @@ License: {LICENSE_NAME}
 ## Contents
 
 This package contains processed source data for all manuscript figures and
-tables, figure files, manuscript source, selected experiment configs, schemas,
+tables, Supplementary Tables S1--S14 as LaTeX source plus an editable workbook,
+figure files, manuscript source, selected experiment configs, schemas,
 reproducibility instructions, final claim-evidence audit documents, scripts for
 source-data regeneration, and SHA256 checksums. Large raw per-episode JSON
 archives and operational scheduler logs are intentionally outside this

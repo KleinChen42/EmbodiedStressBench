@@ -72,7 +72,9 @@ The manuscript includes:
 - generated figures under `paper/scientific_reports/figures/`;
 - bibliography under `paper/scientific_reports/references.bib`;
 - supplementary table entry point
-  `paper/scientific_reports/supplementary_tables.tex`.
+  `paper/scientific_reports/supplementary_tables.tex`;
+- editable supplementary workbook
+  `paper/scientific_reports/supplementary_tables_S1_S14.xlsx`.
 
 If a LaTeX toolchain is available:
 
@@ -134,8 +136,9 @@ scientific_reports_revision_20260521/release_package/
 ```
 
 The release package includes `LICENSE`, `CITATION.cff`, checksum metadata,
-processed source-data CSVs, figure source data, manuscript source, configs,
-schemas, and scripts needed to regenerate the submitted figures and tables.
+processed source-data CSVs, figure source data, manuscript source,
+Supplementary Tables S1--S14, configs, schemas, and scripts needed to
+regenerate the submitted figures and tables.
 
 The current GitHub/Zenodo preparation checklist is:
 

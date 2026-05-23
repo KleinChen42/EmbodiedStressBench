@@ -5,7 +5,7 @@ authors:
   - family-names: Chen
     given-names: Zhuo
     email: zhuoc@chalmers.se
-doi: 10.5281/zenodo.20351628
+doi: 10.5281/zenodo.20352155
 url: "https://github.com/KleinChen42/EmbodiedStressBench"
 repository-code: "https://github.com/KleinChen42/EmbodiedStressBench"
 version: "v0.1.0-scirep"
