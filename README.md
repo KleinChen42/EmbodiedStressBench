@@ -29,7 +29,7 @@ The Scientific Reports source-data release is archived as GitHub release
 `v0.1.0-scirep` with Zenodo version DOI:
 
 ```text
-10.5281/zenodo.20351628
+10.5281/zenodo.20352155
 ```
 
 ## What The Paper Claims
