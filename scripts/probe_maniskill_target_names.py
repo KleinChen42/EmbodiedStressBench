@@ -14,7 +14,7 @@ GENERIC_LABELS = {"", "object", "target object", "requested object", "thing", "i
 
 
 def _is_generic(value: Any) -> bool:
-    text = str(value or "").strip().lower()
+    text = str(value or "").strip().lower().replace("_", " ").replace("-", " ")
     return text in GENERIC_LABELS
 
 

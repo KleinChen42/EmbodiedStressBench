@@ -112,3 +112,52 @@ def test_run_episode_formats_target_label_query_template():
     assert result["query_template"] == "{target_label}"
     assert result["query_original"] == "red cube"
     assert result["query_context"]["target_label"] == "red cube"
+
+
+def test_run_matrix_condition_pairs_avoid_stressor_level_cartesian_product(monkeypatch):
+    seen: list[tuple[str, int, int, str | None]] = []
+
+    def fake_run_episode(*, task, baseline_name, seed, output_dir, query, backend, stressor, level, query_variant=None):
+        seen.append((stressor, level, seed, query_variant))
+        Path(output_dir, f"{task}__{baseline_name}__{stressor}_L{level}__seed{seed}__q-{query_variant}.json").write_text(
+            "{}",
+            encoding="utf-8",
+        )
+        return {
+            "status": "ok",
+            "task": task,
+            "baseline": baseline_name,
+            "seed": seed,
+            "stressor": stressor,
+            "level": level,
+            "query_variant": query_variant,
+            "success": True,
+        }
+
+    cfg = {
+        "env_backend": "mock",
+        "tasks": ["PickCube"],
+        "baselines": ["oracle_target"],
+        "conditions": [
+            {"stressor": "none", "level": 0},
+            {"stressor": "partial_target_occlusion", "level": 3},
+        ],
+        "seeds": [0, 1],
+        "query_variants": {
+            "generic": "target object",
+            "true_name": "{target_label}",
+        },
+    }
+    root = Path("ieee_access_revision_20260520") / f"test_tmp_conditions_{uuid4().hex}"
+    root.mkdir(parents=True, exist_ok=True)
+    config_path = root / "config.yaml"
+    config_path.write_text(yaml.safe_dump(cfg), encoding="utf-8")
+    monkeypatch.setattr(run_matrix_module, "run_episode", fake_run_episode)
+
+    run_matrix_module.run_matrix(config_path, root / "out")
+
+    assert len(seen) == 8
+    assert ("none", 0, 0, "generic") in seen
+    assert ("partial_target_occlusion", 3, 1, "true_name") in seen
+    assert not any(stressor == "none" and level == 3 for stressor, level, *_ in seen)
+    assert not any(stressor == "partial_target_occlusion" and level == 0 for stressor, level, *_ in seen)

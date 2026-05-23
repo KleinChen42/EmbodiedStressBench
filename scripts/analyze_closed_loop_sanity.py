@@ -14,6 +14,16 @@ ERROR_BINS = [0.0, 0.04, 0.06, 0.08, 0.10, 0.15, float("inf")]
 ERROR_LABELS = ["0-0.04", "0.04-0.06", "0.06-0.08", "0.08-0.10", "0.10-0.15", ">0.15"]
 
 
+def _wilson_ci(successes: int, total: int, z: float = 1.959963984540054) -> tuple[float, float]:
+    if total <= 0:
+        return (float("nan"), float("nan"))
+    phat = successes / total
+    denom = 1.0 + z * z / total
+    centre = phat + z * z / (2 * total)
+    margin = z * np.sqrt((phat * (1.0 - phat) + z * z / (4 * total)) / total)
+    return ((centre - margin) / denom, (centre + margin) / denom)
+
+
 def _load_records(root: Path) -> pd.DataFrame:
     rows: list[dict[str, Any]] = []
     names: list[str] = []
@@ -149,14 +159,47 @@ def _error_bins(df: pd.DataFrame, out: Path) -> None:
 
 def _oracle_gate(df: pd.DataFrame, out: Path) -> None:
     oracle = df[df["baseline"] == "oracle_target"]
+    oracle = oracle.copy()
+    oracle["task_success_int"] = oracle["task_success"].astype(bool).astype(int)
     grouped = (
         oracle.groupby("task", dropna=False)
-        .agg(oracle_episodes=("task_success", "size"), oracle_task_success_rate=("task_success", "mean"))
+        .agg(
+            oracle_episodes=("task_success", "size"),
+            oracle_successes=("task_success_int", "sum"),
+            oracle_task_success_rate=("task_success", "mean"),
+        )
         .reset_index()
     )
+    intervals = [
+        _wilson_ci(int(row["oracle_successes"]), int(row["oracle_episodes"]))
+        for _, row in grouped.iterrows()
+    ]
+    grouped["oracle_task_success_ci_low"] = [lo for lo, _ in intervals]
+    grouped["oracle_task_success_ci_high"] = [hi for _, hi in intervals]
+    failures = oracle.copy()
+    failures["failure_type"] = failures["failure_type"].fillna("success")
+    failure_mode = (
+        failures[~failures["task_success"].astype(bool)]
+        .groupby("task")["failure_type"]
+        .agg(lambda s: s.value_counts().index[0] if len(s) else "none")
+    )
+    grouped["dominant_failure_type"] = grouped["task"].map(failure_mode).fillna("none")
     grouped["passes_pickcube_gate_080"] = np.where(grouped["task"] == "PickCube", grouped["oracle_task_success_rate"] >= 0.80, "")
     grouped["passes_picksingleycb_gate_070"] = np.where(grouped["task"] == "PickSingleYCB", grouped["oracle_task_success_rate"] >= 0.70, "")
     grouped["passes_stackcube_gate_080"] = np.where(grouped["task"] == "StackCube", grouped["oracle_task_success_rate"] >= 0.80, "")
+    grouped.to_csv(out, index=False)
+
+
+def _failure_distribution(df: pd.DataFrame, out: Path) -> None:
+    data = df.copy()
+    data["failure_type"] = data["failure_type"].fillna("success")
+    grouped = (
+        data.groupby(["task", "failure_type"], dropna=False)
+        .size()
+        .reset_index(name="episodes")
+    )
+    totals = grouped.groupby("task")["episodes"].transform("sum")
+    grouped["rate"] = grouped["episodes"] / totals
     grouped.to_csv(out, index=False)
 
 
@@ -211,6 +254,7 @@ def main() -> None:
     _diagnostic_vs_task(df, out_dir / "closed_loop_diagnostic_vs_task_success.csv")
     _error_bins(df, out_dir / "closed_loop_target_error_bins.csv")
     _oracle_gate(df, out_dir / "closed_loop_oracle_gate_by_task.csv")
+    _failure_distribution(df, out_dir / "closed_loop_failure_distribution.csv")
     _report(df, summary, out_dir / "closed_loop_sanity_report.md", root)
     print(f"Wrote closed-loop sanity artifacts under {out_dir}")
 

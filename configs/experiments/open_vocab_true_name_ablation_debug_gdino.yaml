@@ -1,0 +1,16 @@
+name: open_vocab_true_name_ablation_debug_gdino
+description: Single-episode GroundingDINO environment debug for Scientific Reports query ablation.
+env_backend: maniskill
+tasks:
+  - PickSingleYCB
+baselines:
+  - crop_median_depth_grounding_dino
+conditions:
+  - stressor: none
+    level: 0
+seed_range:
+  start: 105
+  stop: 106
+query_variants:
+  true_name: "{target_label}"
+expected_episodes: 1

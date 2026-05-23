@@ -30,7 +30,7 @@ The paper should be evaluated as a reproducible diagnostic study/benchmark for q
   - GroundingDINO generic prompts: 23.8%,
   - GroundingDINO true object-name prompts: 61.4%.
 - Scripted closed-loop oracle-gate audit fails; it is framed only as a claim boundary/limitation.
-- Data/code are archived for GitHub release `v0.1.0-scirep` at `https://github.com/KleinChen42/EmbodiedStressBench.git` with Zenodo version DOI `10.5281/zenodo.20351628`.
+- Data/code are archived for GitHub release `v0.1.0-scirep` at `https://github.com/KleinChen42/EmbodiedStressBench.git` with Zenodo version DOI `10.5281/zenodo.20352155`.
 
 ## What I want you to check
 
@@ -43,7 +43,7 @@ The paper should be evaluated as a reproducible diagnostic study/benchmark for q
 7. Is the failed closed-loop oracle audit correctly framed, or should execution be further de-emphasized?
 8. Are the statistical methods sufficient: confidence intervals, seed/frame-block bootstrap, threshold sensitivity, and claim boundaries?
 9. Are any major claims unsupported or too strong?
-10. Are Data Availability and Code Availability ready for Scientific Reports with Zenodo version DOI `10.5281/zenodo.20351628`?
+10. Are Data Availability and Code Availability ready for Scientific Reports with Zenodo version DOI `10.5281/zenodo.20352155`?
 11. Are required declarations complete: Author Contributions, Competing Interests, Funding, Acknowledgements, Data Availability, Code Availability?
 12. Are the 5 main figures and 3 main tables readable enough for Scientific Reports, especially the protocol schematic, detector-bridge figure, external RGB-D figure, qualitative figure, and execution-audit table?
 13. Is the main-text display budget now compliant, and should any remaining main-text table/figure move to Supplementary?

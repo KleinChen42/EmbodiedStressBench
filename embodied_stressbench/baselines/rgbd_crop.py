@@ -155,6 +155,37 @@ def _selected_detection_bbox(
         detection, selection_debug = _select_clip_rerank_detection(observation, query)
     elif strategy == "grounding_dino":
         detection, selection_debug = _select_grounding_dino_detection(observation, query)
+    elif strategy == "oracle_2d_box":
+        detection = next((det for det in observation.detections if det.get("is_target")), None)
+        if detection is None and observation.object_metadata.get("target_bbox_xyxy") is not None:
+            detection = {
+                "label": observation.object_metadata.get("target_label", "oracle_target"),
+                "bbox_xyxy": observation.object_metadata.get("target_bbox_xyxy"),
+                "score": 1.0,
+                "source": "oracle_2d_box",
+                "is_target": True,
+                "distractor_type": None,
+            }
+        if detection is None:
+            selection_debug = {
+                "selection_strategy": "oracle_2d_box",
+                "selection_failure_reason": "oracle_2d_box_unavailable",
+                "num_candidate_detections": len(observation.detections),
+            }
+        else:
+            try:
+                index = observation.detections.index(detection)
+            except ValueError:
+                index = None
+            selection_debug = {
+                "selection_strategy": "oracle_2d_box",
+                "selected_detection_index": index,
+                "selected_detection_label": detection.get("label"),
+                "selected_detection_is_target": bool(detection.get("is_target", False)),
+                "selected_detection_distractor_type": detection.get("distractor_type"),
+                "selection_failure_reason": None,
+                "num_candidate_detections": len(observation.detections),
+            }
     else:
         raise ValueError(f"Unknown detection selection strategy: {strategy}")
     if detection is None:
@@ -327,6 +358,21 @@ class CropTrimmedMedianDepthFirstDetectionBaseline(CropTrimmedMedianDepthBaselin
 class CropTopSurfaceFirstDetectionBaseline(CropTopSurfaceBaseline):
     name = "crop_top_surface_first_detection"
     selection_strategy = "first_detection"
+
+
+class BoxCenterDepthOracle2DBoxBaseline(BoxCenterDepthBaseline):
+    name = "box_center_depth_oracle_2d_box"
+    selection_strategy = "oracle_2d_box"
+
+
+class CropMedianDepthOracle2DBoxBaseline(CropMedianDepthBaseline):
+    name = "crop_median_depth_oracle_2d_box"
+    selection_strategy = "oracle_2d_box"
+
+
+class CropTrimmedMedianDepthOracle2DBoxBaseline(CropTrimmedMedianDepthBaseline):
+    name = "crop_trimmed_median_depth_oracle_2d_box"
+    selection_strategy = "oracle_2d_box"
 
 
 class BoxCenterDepthClipRerankBaseline(BoxCenterDepthBaseline):

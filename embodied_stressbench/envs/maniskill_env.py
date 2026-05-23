@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import re
 from typing import Any, Dict, Tuple
 
 import numpy as np
@@ -14,6 +15,61 @@ _TASK_TO_ENV_ID = {
     "StackCube": "StackCube-v1",
     "PickSingleYCB": "PickSingleYCB-v1",
     "PickClutterYCB": "PickClutterYCB-v1",
+}
+
+_YCB_OBJECT_NAMES = {
+    "002": "master chef can",
+    "003": "cracker box",
+    "004": "sugar box",
+    "005": "tomato soup can",
+    "006": "mustard bottle",
+    "007": "tuna fish can",
+    "008": "pudding box",
+    "009": "gelatin box",
+    "010": "potted meat can",
+    "011": "banana",
+    "012": "strawberry",
+    "013": "apple",
+    "014": "lemon",
+    "015": "peach",
+    "016": "pear",
+    "017": "orange",
+    "018": "plum",
+    "019": "pitcher base",
+    "021": "bleach cleanser",
+    "024": "bowl",
+    "025": "mug",
+    "026": "sponge",
+    "029": "plate",
+    "030": "fork",
+    "031": "spoon",
+    "032": "knife",
+    "033": "spatula",
+    "035": "power drill",
+    "036": "wood block",
+    "037": "scissors",
+    "040": "large marker",
+    "042": "adjustable wrench",
+    "043": "phillips screwdriver",
+    "044": "flat screwdriver",
+    "048": "hammer",
+    "049": "small clamp",
+    "050": "medium clamp",
+    "051": "large clamp",
+    "052": "extra large clamp",
+    "053": "mini soccer ball",
+    "054": "softball",
+    "055": "baseball",
+    "056": "tennis ball",
+    "057": "racquetball",
+    "058": "golf ball",
+    "059": "chain",
+    "061": "foam brick",
+    "063": "marbles",
+    "065": "cups",
+    "072": "toy airplane",
+    "073": "lego duplo",
+    "077": "rubiks cube",
 }
 
 
@@ -45,6 +101,25 @@ def _info_success(info: Any) -> bool | None:
     if arr.size == 0:
         return None
     return bool(np.asarray(arr).reshape(-1)[0])
+
+
+def _simple_info(info: Dict[str, Any]) -> Dict[str, Any]:
+    simple: Dict[str, Any] = {}
+    for key, value in info.items():
+        try:
+            arr = _to_numpy(value)
+            if arr.size == 1:
+                scalar = arr.reshape(-1)[0]
+                if isinstance(scalar, np.generic):
+                    scalar = scalar.item()
+                if isinstance(scalar, (bool, int, float, str)):
+                    simple[str(key)] = scalar
+            elif arr.size and arr.size <= 4 and np.issubdtype(arr.dtype, np.number):
+                simple[str(key)] = arr.reshape(-1).astype(float).tolist()
+        except Exception:
+            if isinstance(value, (bool, int, float, str)):
+                simple[str(key)] = value
+    return simple
 
 
 def _as_4x4(matrix: np.ndarray) -> np.ndarray:
@@ -286,6 +361,7 @@ class ManiSkillManipulationEnv:
         ]
         saw_success = False
         last_info: Dict[str, Any] = {}
+        last_simple_info: Dict[str, Any] = {}
         steps = 0
         try:
             for waypoint, gripper, repeat in waypoints:
@@ -304,6 +380,7 @@ class ManiSkillManipulationEnv:
                         _, _, done, info = step_out
                         terminated, truncated = done, False
                     last_info = dict(info) if isinstance(info, dict) else {}
+                    last_simple_info = _simple_info(last_info)
                     success = _info_success(last_info)
                     saw_success = saw_success or bool(success)
                     steps += 1
@@ -323,16 +400,28 @@ class ManiSkillManipulationEnv:
                 },
             )
 
+        failure_type = None if saw_success else self._classify_scripted_failure(last_simple_info)
         return ExecutionResult(
             saw_success,
-            None if saw_success else "scripted_task_failed",
+            failure_type,
             {
                 "scripted_executor": "maniskill_delta_pick",
                 "closed_loop_task_success": saw_success,
                 "steps": steps,
                 "last_info_keys": sorted(last_info.keys()),
+                "last_info_scalar": last_simple_info,
             },
         )
+
+    def _classify_scripted_failure(self, info: Dict[str, Any]) -> str:
+        lowered = {str(k).lower(): v for k, v in info.items()}
+        grasp_keys = [k for k in lowered if "grasp" in k or "grip" in k or "holding" in k]
+        if grasp_keys and not any(bool(lowered[k]) for k in grasp_keys):
+            return "no_grasp"
+        success_keys = [k for k in lowered if k == "success" or k.endswith("_success")]
+        if success_keys and not any(bool(lowered[k]) for k in success_keys):
+            return "task_condition_not_met"
+        return "scripted_task_failed"
 
     def _object_spec(self) -> _ObjectSpec:
         if self.task == "StackCube":
@@ -393,20 +482,140 @@ class ManiSkillManipulationEnv:
                 }
                 if simple:
                     debug[f"env_scan.{attr}"] = simple
+            else:
+                text = repr(value)
+                if len(text) <= 240:
+                    debug[f"env_scan.{attr}.repr"] = text
+        for source, value in self._trusted_target_label_candidates(actor):
+            if value is not None:
+                debug[source] = value
         return debug
 
     def _normalize_label_candidate(self, value: Any) -> str | None:
         if not isinstance(value, str):
             return None
-        label = value.replace("ycb_", "").replace("_", " ").replace("-", " ").strip().lower()
-        generic = {"", "obj", "object", "target object", "target", "target object clone", "actor", "ycb object"}
+        raw = value.strip().lower()
+        for model_id, name in _YCB_OBJECT_NAMES.items():
+            if re.search(rf"(^|[^0-9]){re.escape(model_id)}([^0-9]|$)", raw):
+                return name
+            if name.replace(" ", "_") in raw or name in raw.replace("_", " "):
+                return name
+        if "<" in raw or ">" in raw or "bound method" in raw or " object at 0x" in raw:
+            return None
+        label = raw.replace("ycb_", "").replace("_", " ").replace("-", " ").strip().lower()
+        label = re.sub(r"^\d+\s+", "", label).strip()
+        generic = {
+            "",
+            "none",
+            "obj",
+            "object",
+            "target object",
+            "target",
+            "target object clone",
+            "actor",
+            "ycb object",
+            "ycbobject",
+        }
         if label in generic:
             return None
         if label.isdigit():
             return None
         return label
 
+    def _label_candidate_strings(self, value: Any) -> list[str]:
+        if isinstance(value, str):
+            return [value]
+        if isinstance(value, dict):
+            out: list[str] = []
+            for key, item in value.items():
+                out.append(str(key))
+                out.extend(self._label_candidate_strings(item))
+            return out
+        if isinstance(value, (list, tuple)):
+            out: list[str] = []
+            for item in value:
+                out.extend(self._label_candidate_strings(item))
+            return out
+        return []
+
+    def _trusted_target_label_candidates(self, actor: Any) -> list[tuple[str, Any]]:
+        """Return object-name candidates tied to the selected target actor.
+
+        This deliberately avoids global YCB catalog fields such as all_model_ids.
+        Scientific claims about true-name prompting should only use labels that are
+        recoverable from the target actor or an object matched to that actor.
+        """
+
+        candidates: list[tuple[str, Any]] = []
+        env = self.env.unwrapped
+
+        def add(source: str, obj: Any) -> None:
+            for attr in ("name", "_name", "model_id", "_model_id", "asset_id", "asset_name"):
+                try:
+                    value = getattr(obj, attr)
+                except Exception:
+                    continue
+                if isinstance(value, (str, int, float)):
+                    candidates.append((f"{source}.{attr}", str(value)))
+
+        add("actor", actor)
+
+        for attr in ("obj", "target_object"):
+            try:
+                env_obj = getattr(env, attr)
+            except Exception:
+                continue
+            add(f"env.{attr}", env_obj)
+
+        if self.task == "PickSingleYCB":
+            try:
+                objs = list(getattr(env, "_objs"))
+            except Exception:
+                objs = []
+            visible_objs = []
+            for obj in objs:
+                try:
+                    hidden = bool(getattr(obj, "hidden", False))
+                except Exception:
+                    hidden = False
+                if not hidden:
+                    visible_objs.append(obj)
+            if len(visible_objs) == 1:
+                add("env._objs[0]", visible_objs[0])
+
+        if self.task == "PickClutterYCB":
+            try:
+                target_pos = _first_batch(actor.pose.p).astype(float, copy=False)
+            except Exception:
+                target_pos = None
+            try:
+                selectable = getattr(env, "selectable_target_objects")
+            except Exception:
+                selectable = []
+            for idx, obj in enumerate(self._flatten_objects(selectable)):
+                try:
+                    pos = _first_batch(obj.pose.p).astype(float, copy=False)
+                except Exception:
+                    continue
+                if target_pos is not None and np.linalg.norm(pos - target_pos) <= 1e-5:
+                    add(f"env.selectable_target_objects.matched_{idx}", obj)
+                    break
+
+        return candidates
+
+    def _flatten_objects(self, value: Any) -> list[Any]:
+        if isinstance(value, (list, tuple)):
+            out: list[Any] = []
+            for item in value:
+                out.extend(self._flatten_objects(item))
+            return out
+        return [value]
+
     def _actor_label(self, actor: Any, fallback: str, debug: dict[str, Any]) -> tuple[str, str]:
+        for source, value in self._trusted_target_label_candidates(actor):
+            label = self._normalize_label_candidate(str(value))
+            if label:
+                return label, source
         for key in [
             "actor.name",
             "actor._name",
@@ -419,13 +628,10 @@ class ManiSkillManipulationEnv:
             "env.model_id",
             "env.asset_id",
         ]:
-            label = self._normalize_label_candidate(debug.get(key))
-            if label:
-                return label, key
-        for key, value in debug.items():
-            label = self._normalize_label_candidate(value)
-            if label:
-                return label, key
+            for candidate in self._label_candidate_strings(debug.get(key)):
+                label = self._normalize_label_candidate(candidate)
+                if label:
+                    return label, key
         return fallback, "fallback"
 
     def _target_category(self, label: str) -> str:

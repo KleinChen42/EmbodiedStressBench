@@ -35,6 +35,13 @@ def run_matrix(
     baselines = cfg.get("baselines", ["oracle_target"])
     stressors = cfg.get("stressors", ["none"])
     levels = [int(x) for x in cfg.get("levels", [0])]
+    if cfg.get("conditions"):
+        conditions = [
+            (str(item.get("stressor", "none")), int(item.get("level", 0)))
+            for item in cfg["conditions"]
+        ]
+    else:
+        conditions = list(product(stressors, levels))
     seeds = _seeds_from_config(cfg)
     backend = cfg.get("env_backend", "mock")
     default_query = cfg.get("default_query", "pick the red cube")
@@ -45,7 +52,12 @@ def run_matrix(
     else:
         query_items = [("", "")]
 
-    combinations = list(product(tasks, baselines, stressors, levels, seeds, query_items))
+    combinations = [
+        (task, baseline, stressor, level, seed, query_item)
+        for task, baseline, (stressor, level), seed, query_item in product(
+            tasks, baselines, conditions, seeds, query_items
+        )
+    ]
     full_total = len(combinations)
     if (shard_index is None) != (num_shards is None):
         raise ValueError("shard_index and num_shards must be provided together")
@@ -74,6 +86,18 @@ def run_matrix(
         if shard_index is not None and num_shards is not None:
             print(f"Dry run: shard={shard_index}/{num_shards}")
         return
+
+    if any("grounding_dino" in str(baseline) for baseline in baselines):
+        try:
+            from embodied_stressbench.baselines.rgbd_crop import _get_grounding_dino_provider
+
+            provider = _get_grounding_dino_provider()
+            if provider is None:
+                print("GroundingDINO warmup: unavailable; rows will report no_detection with diagnostic error.")
+            else:
+                print(f"GroundingDINO warmup: loaded {provider.model_name} on {provider.device}")
+        except Exception as exc:
+            print(f"GroundingDINO warmup: failed with {type(exc).__name__}: {exc}")
 
     existing_result_names = {
         path.name

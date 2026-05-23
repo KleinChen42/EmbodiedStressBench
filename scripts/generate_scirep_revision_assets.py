@@ -928,25 +928,26 @@ def _write_protocol_schematic(figures_dir: Path) -> None:
 
 def _write_experiment_design_table(tables_dir: Path) -> None:
     rows = [
-        ("Main diagnostic sweeps", "PickCube, StackCube, PickSingleYCB, PickClutterYCB", "oracle, box-center, crop-median, crop-top", "parameterized stressors", "seed-block bootstrap"),
-        ("Detector bridge", "PickCube, PickSingleYCB, PickClutterYCB", "metadata, first detection, GroundingDINO", "semantic ambiguity, occlusion, depth sparsity", "detector failure taxonomy"),
-        ("YCB/clutter query checks", "PickSingleYCB, PickClutterYCB", "GroundingDINO, metadata control", "query variants, hard stressors", "actual query audit"),
-        ("Execution calibration audit", "PickCube, PickSingleYCB", "oracle, box-center, crop-median", "scripted executor smoke", "oracle gate required"),
+        ("Main diagnostic sweeps", "oracle, box-center, crop-median, crop-top", "Parameterized ManiSkill stressors; seed-block bootstrap over task seeds."),
+        ("Detector-bridge sweep", "metadata-assisted selector, first detection, one GroundingDINO plug-in", "Query, domain, and adapter-label failure taxonomy under matched RGB-D lifting."),
+        ("External YCB-V/BOP probe", "oracle masks, oracle boxes, first box, one GroundingDINO route", "Static real RGB-D target-generation scope check; frame-block bootstrap."),
+        ("Execution audit", "oracle, box-center, crop-median target sources", "Scripted executor smoke test; oracle gate required for any execution claim."),
     ]
     lines = [
-        r"\begin{table*}[t]",
+        r"\begin{table}[t]",
         r"\centering",
-        r"\caption{Experimental design summary. Detailed stressor parameters are provided in Supplementary Table S1.}",
+        r"\caption{Experimental design summary. Detailed stressor parameters and full task lists are provided in Supplementary Table S1.}",
         r"\label{tab:scirep-experiment-design}",
         r"\scriptsize",
-        r"\begin{tabular}{lllll}",
+        r"\setlength{\tabcolsep}{3pt}",
+        r"\begin{tabular}{p{0.24\linewidth}p{0.34\linewidth}p{0.34\linewidth}}",
         r"\toprule",
-        r"Evidence set & Tasks & Compared modules & Perturbations & Statistical unit \\",
+        r"Evidence set & Compared modules & Purpose and statistical unit \\",
         r"\midrule",
     ]
     for row in rows:
         lines.append(" & ".join(row) + r" \\")
-    lines.extend([r"\bottomrule", r"\end{tabular}", r"\end{table*}", ""])
+    lines.extend([r"\bottomrule", r"\end{tabular}", r"\end{table}", ""])
     (tables_dir / "experiment_design_summary.tex").write_text("\n".join(lines), encoding="utf-8")
 
 

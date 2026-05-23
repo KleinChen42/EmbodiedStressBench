@@ -11,7 +11,7 @@ Date: 2026-05-23
 - Updated claim-evidence documentation to prevent unsupported closed-loop, real-robot, or VLA-policy claims.
 - Expanded Scientific Reports related work coverage to 37 cited references.
 - Rewrote Data and Code Availability around the public GitHub repository and a staged release package.
-- Finalized release metadata with Zenodo version DOI `10.5281/zenodo.20351628`, release tag `v0.1.0-scirep`, MIT license, citation metadata, and checksum generation.
+- Finalized release metadata with Zenodo version DOI `10.5281/zenodo.20352155`, release tag `v0.1.0-scirep`, MIT license, citation metadata, and checksum generation.
 - Added a trusted YCB target-name probe and a 960-episode GroundingDINO true-name query ablation. The final ablation uses an explicit GroundingDINO warmup and `LD_PRELOAD` fix so detector debug fields are present.
 - Integrated the full YCB-V/BOP external RGB-D validation run and the chained GroundingDINO detector-threshold sweep from archived experiment outputs, replacing the earlier 96k-record preliminary table.
 - Reframed the Scientific Reports abstract, introduction, methods, discussion, and availability statements so the external YCB-V/BOP probe is presented as a main scope-check evidence pillar rather than an appendix-style add-on.
@@ -87,7 +87,7 @@ Not supported yet:
 - The P0/P1 release package was rebuilt under `scientific_reports_revision_20260521/release_package/`, including the full YCB-V/BOP summary source data and detector-threshold sweep logs.
 - The manuscript text now explicitly describes the external YCB-V/BOP frame-block bootstrap confidence-interval unit and avoids the obsolete `simulation-only` limitation phrasing.
 - A DOI-final release zip was created at `scientific_reports_revision_20260521/release_package_v0.1.0-scirep_20260523_doi_final.zip`; the matching Overleaf source zip is `scientific_reports_revision_20260521/scientific_reports_overleaf_final_20260523_doi.zip`.
-- The manuscript and release metadata now cite Zenodo version DOI `10.5281/zenodo.20351628`.
+- The manuscript and release metadata now cite Zenodo version DOI `10.5281/zenodo.20352155`.
 - PDF build was not completed locally because `pdflatex`, `latexmk`, and
   `tectonic` are not installed, and Docker Desktop is present but its daemon is
   not running.
@@ -98,5 +98,5 @@ Not supported yet:
 2. Commit and push the final package cleanup, then make sure release tag
    `v0.1.0-scirep` points to the submitted package commit.
 3. Create or refresh the GitHub release and upload the DOI-final release package.
-4. Use Zenodo version DOI `10.5281/zenodo.20351628` in the submitted manuscript and repository metadata.
+4. Use Zenodo version DOI `10.5281/zenodo.20352155` in the submitted manuscript and repository metadata.
 5. Revisit closed-loop calibration only after a scripted executor passes the oracle gate.
