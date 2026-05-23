@@ -1,5 +1,13 @@
 # Scientific Reports Manuscript Draft
 
+Title:
+
+> EmbodiedStressBench: A Reproducible Simulation Diagnostic for Query-Conditioned 3D Target Localization in Robotic Manipulation
+
+Author and correspondence:
+
+> Zhuo Chen, zhuoc@chalmers.se
+
 Canonical entry point:
 
 ```bash
@@ -18,10 +26,11 @@ validated closed-loop executor passes the oracle gate.
 Key generated assets:
 
 - `tables/open_vocab_detector_transfer_summary.tex`
-- `tables/closed_loop_smoke_outcome.tex`
-- `figures/open_vocab_detector_transfer_success.png`
-- `figures/open_vocab_detector_transfer_no_detection.png`
+- `tables/query_ablation_summary.tex`
+- `tables/closed_loop_oracle_calibration_v2_gate.tex`
+- `figures/open_vocab_detector_transfer_combined.png`
+- `figures/maniskill_qualitative_main_figure.png`
 - `docs/scientific_reports_result_to_claim.md`
 
-Before submission, replace `[repository/DOI]` placeholders with a real code and
-artifact release.
+Before submission, freeze the public GitHub release and insert the Zenodo DOI
+for the source-data package in the Data Availability section.

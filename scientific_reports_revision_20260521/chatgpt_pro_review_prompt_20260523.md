@@ -2,7 +2,7 @@
 
 You are acting as a Scientific Reports editor, a robotics/manipulation methods reviewer, an open-vocabulary perception reviewer, a statistics/reproducibility reviewer, and a devil's advocate reviewer.
 
-Please review the attached manuscript PDF as a near-submission Scientific Reports paper. The goal is not only to find fatal flaws, but to identify concrete changes that would most improve acceptance probability.
+Please review the attached manuscript PDF and, if provided, the repository README/reproducibility files as a near-submission Scientific Reports package. The goal is not only to find fatal flaws, but to identify concrete changes that would most improve acceptance probability.
 
 ## Target journal
 
@@ -30,7 +30,7 @@ The paper should be evaluated as a reproducible diagnostic study/benchmark for q
   - GroundingDINO generic prompts: 23.8%,
   - GroundingDINO true object-name prompts: 61.4%.
 - Scripted closed-loop oracle-gate audit fails; it is framed only as a claim boundary/limitation.
-- Data/code are intended for GitHub release and Zenodo DOI before final submission.
+- Data/code are intended for GitHub release `v0.1.0-scirep` at `https://github.com/KleinChen42/EmbodiedStressBench.git` and a Zenodo DOI before final submission.
 
 ## What I want you to check
 
@@ -49,6 +49,8 @@ The paper should be evaluated as a reproducible diagnostic study/benchmark for q
 13. Should any main-text table/figure move to Supplementary?
 14. Are references broad and credible enough, or should key works be added/replaced?
 15. What small or medium experiment, if any, would most improve acceptance probability?
+16. Do the README, reproducibility pack, Data Availability, and Code Availability statements agree with the manuscript and avoid stale IEEE Access wording?
+17. Are any GitHub/Zenodo/release-package details still too vague for Scientific Reports technical checks?
 
 ## Output requested
 
@@ -69,4 +71,3 @@ Please provide:
 10. Final go/no-go recommendation.
 
 Please prioritize changes that improve acceptance probability without requiring large new experiments. If you recommend a new experiment, explain exactly what reviewer concern it resolves and the smallest credible version of the experiment.
-

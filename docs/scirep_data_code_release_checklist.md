@@ -9,7 +9,7 @@ Planned release tag: `v0.1.0-scirep`
 - Create the public GitHub release `v0.1.0-scirep`.
 - Upload or attach `scientific_reports_revision_20260521/release_package/`.
 - Archive the GitHub release with Zenodo.
-- Replace the release-package DOI field `TO_BE_FILLED_AFTER_ZENODO_ARCHIVE` with the minted DOI.
+- Replace the pending DOI sentence in the manuscript and release metadata with the minted DOI.
 - Update the manuscript Data Availability statement with the Zenodo DOI.
 
 ## Included In The Staged Release Package
@@ -20,12 +20,12 @@ Planned release tag: `v0.1.0-scirep`
 - Experiment configs, including the query-ablation config.
 - JSON schema and reproducibility README.
 - Result-to-claim audit and experiment status documents.
-- Scripts for analysis, table generation, qualitative render export, and H200 follow-up.
+- Scripts for analysis, table generation, qualitative render export, and remote follow-up.
 
 ## Not Included By Default
 
 - The complete 400k+ per-episode JSON archive, due size.
-- H200 system logs and internal GPU scheduling logs.
+- Internal system logs and private scheduler logs.
 - Secrets, SSH keys, local paths, or private environment files.
 
 ## Recommended Data Availability Wording After DOI Minting

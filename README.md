@@ -1,94 +1,106 @@
 # EmbodiedStressBench
 
-**A reproducible diagnostic benchmark for stress testing language-to-target generation in robotic manipulation**
+EmbodiedStressBench is a reproducible diagnostic benchmark for query-conditioned
+3D target localization in robotic manipulation. The project studies where a
+language or object query becomes an executable 3D target, separating detector or
+selector behavior, RGB-D target lifting, stressor sensitivity, and downstream
+execution-calibration boundaries.
 
-EmbodiedStressBench is a simulation-based diagnostic benchmark for isolating
-failures in the language-query-to-3D-target stage of robotic manipulation
-pipelines. It evaluates how target selection, RGB-D target generation, visual
-and geometric corruptions, semantic distractors, and execution perturbations
-affect diagnostic manipulation success.
+Current manuscript target:
 
-Current IEEE Access manuscript title:
+> Scientific Reports
 
-> EmbodiedStressBench: A Reproducible Diagnostic Benchmark for Stress Testing Language-to-Target Generation in Robotic Manipulation
+Canonical manuscript title:
 
-Target venue for the first version:
+> EmbodiedStressBench: A Reproducible Simulation Diagnostic for
+> Query-Conditioned 3D Target Localization in Robotic Manipulation
 
-> IEEE Access / intelligent robotics / engineering AI style journal
+Public repository:
 
-Core thesis:
+> https://github.com/KleinChen42/EmbodiedStressBench.git
 
-> Clean manipulation success can hide failures in the target-generation stage.
-> EmbodiedStressBench stress-tests this stage under semantic, visual,
-> geometric, and execution perturbations, then separates semantic selection,
-> RGB-D target generation, depth validity, and execution-tolerance failures
-> using oracle-gap and failure-taxonomy analyses.
+Author and correspondence:
 
-## IEEE Access Manuscript Source
+> Zhuo Chen, zhuoc@chalmers.se
 
-The canonical submission source is:
+The source-data release is intended to be frozen as GitHub release
+`v0.1.0-scirep` and archived with Zenodo before journal submission. The Zenodo
+DOI is intentionally not hard-coded until the author mints the archive.
+
+## What The Paper Claims
+
+Supported claims:
+
+- Parameterized simulation stressors expose target-generation failure modes.
+- Target sources show a precision--robustness tradeoff: box-center targets are
+  more precise under strict thresholds, while crop-median targets are stronger
+  at the default and relaxed thresholds.
+- Open-vocabulary detector modules can be audited through the same protocol,
+  with GroundingDINO used as a scoped plug-in detector rather than as a detector
+  leaderboard.
+- External YCB-V/BOP RGB-D validation separates RGB-D lifting controls from
+  detector/query failure without claiming real-robot manipulation.
+- The scripted closed-loop oracle-gate audit fails; execution calibration is
+  therefore reported as a limitation and claim boundary.
+
+Not claimed:
+
+- No real-robot robustness.
+- No closed-loop policy benchmark.
+- No SOTA VLA comparison.
+- No claim that GroundingDINO generally fails beyond the tested query/adaptor
+  setting.
+- No claim that crop-median depth is universally best.
+
+## Manuscript Source
+
+Compile the Scientific Reports draft from:
 
 ```text
-paper/ieee_access/main_revised.tex
+paper/scientific_reports/main.tex
 ```
 
-Do not compile `paper/main.tex` for submission. It is a legacy guard that
-intentionally errors to prevent accidentally rebuilding the old experiment-log
-draft. To build the submission PDF when a LaTeX environment is available, run:
+The manuscript includes:
 
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts\build_ieee_access_pdf.ps1
+- main source and sections under `paper/scientific_reports/`;
+- generated tables under `paper/scientific_reports/tables/`;
+- generated figures under `paper/scientific_reports/figures/`;
+- bibliography under `paper/scientific_reports/references.bib`;
+- supplementary table entry point
+  `paper/scientific_reports/supplementary_tables.tex`.
+
+If a LaTeX toolchain is available:
+
+```bash
+cd paper/scientific_reports
+pdflatex main
+bibtex main
+pdflatex main
+pdflatex main
 ```
 
-Generated main-text tables live in `paper/ieee_access/tables/`. Oversized
-generated tables are moved to `paper/ieee_access/tables/supplement/` and can be
-compiled through `paper/ieee_access/supplementary_tables.tex`.
-The IEEE Access directory also includes `paper/ieee_access/references.bib`, so
-BibTeX should use `\bibliography{references}` from that manuscript directory.
+## Repository Layout
 
-## What this repository includes
+- `embodied_stressbench/`: benchmark code and target-source implementations.
+- `configs/experiments/`: reproducible experiment matrices.
+- `configs/stressors/`: parameterized stressor definitions.
+- `scripts/`: analysis, plotting, remote launch, and release helpers.
+- `paper/scientific_reports/`: current Scientific Reports manuscript source.
+- `scientific_reports_revision_20260521/`: generated source data, revision
+  reports, release-package staging, and reviewer prompts.
+- `schemas/`: episode-result schema documentation.
+- `tests/`: unit and regression tests.
 
-- A reproducible Python package skeleton.
-- Config-driven experiment definitions.
-- A mock manipulation environment that runs without ManiSkill or robot hardware.
-- Baseline target-source methods:
-  - `oracle_target`
-  - `box_center_depth`
-  - `crop_median_depth`
-  - `crop_top_surface`
-  - `multiview_memory` placeholder
-- Stressors:
-  - semantic query variants
-  - depth noise
-  - visual occlusion
-  - camera pose noise placeholder
-  - execution target offset
-- JSON/JSONL result logging.
-- Batch runner with resume and error recording.
-- Report aggregation scripts.
-- Codex prompts for incremental development.
-- A 6-week project plan.
-- IEEE Access manuscript source and generated analysis artifacts.
-
-## Quick start
+## Quick Start
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -e .
+python -m pytest -q tests
 ```
 
-Run the mock smoke test:
-
-```bash
-python -m embodied_stressbench.runners.run_single \
-  --task PickCube \
-  --baseline oracle_target \
-  --seed 0 \
-  --output outputs/smoke_pickcube_oracle
-```
-
-Run a tiny experiment matrix:
+Run a small mock matrix:
 
 ```bash
 python -m embodied_stressbench.runners.run_matrix \
@@ -96,7 +108,7 @@ python -m embodied_stressbench.runners.run_matrix \
   --output outputs/tiny_mock
 ```
 
-Generate a markdown report:
+Generate a report:
 
 ```bash
 python -m embodied_stressbench.reporting.make_report \
@@ -104,78 +116,32 @@ python -m embodied_stressbench.reporting.make_report \
   --output outputs/tiny_mock/report.md
 ```
 
-## H200 helper scripts
+## Reproducing Paper Assets
 
-This project includes self-contained H200 connection helpers under `scripts/`.
-They use the SSH key named `hd03-tenant13-research-20260405` from
-`$HOME/.ssh/` and read the key passphrase from either the current environment
-or a local `.env.local` file. Do not commit `.env.local`.
+See [README_REPRODUCIBILITY.md](README_REPRODUCIBILITY.md) for the
+Scientific Reports source-data package, expected evidence sets, and commands to
+regenerate tables and figures.
 
-Create a local secret file if desired:
+The staged release package is:
 
-```powershell
-Copy-Item .env.local.example .env.local
-# edit .env.local and set SSH_KEY_PASSPHRASE
+```text
+scientific_reports_revision_20260521/release_package/
 ```
 
-Check H200 status:
+The current GitHub/Zenodo preparation checklist is:
 
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts\h200_status.ps1
+```text
+docs/scirep_data_code_release_checklist.md
 ```
 
-Run a read-only remote command:
+## Secrets And Remote Helpers
 
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts\invoke_h200_command.ps1 `
-  -RemoteCommand "date && pwd && nvidia-smi --query-gpu=index,memory.used,utilization.gpu --format=csv,noheader"
-```
+Some helper scripts support remote experiment launch and artifact sync. Local
+secrets must live in `.env.local`, which must not be committed. Use
+`.env.local.example` only as a template.
 
-Launch a remote script without blocking the local PowerShell session:
+## Safety And Scope
 
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts\h200_launch_detached.ps1 `
-  -RemoteScript outputs/my_launch.sh `
-  -RemoteDir /home/zetyun/OpenMythos_test
-```
-
-Sync lightweight files:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts\sync_h200_files.ps1 `
-  -Direction push `
-  -Paths configs\experiments\exp_tiny_mock.yaml
-```
-
-## Design principles
-
-1. **No fake results.** Every table and figure must come from JSON/JSONL outputs.
-2. **Simulation-first.** The starter runs in mock mode; ManiSkill/Isaac/LIBERO adapters can be added later.
-3. **Small-to-large scaling.** Run 1 seed -> 5 seeds -> 20 seeds -> 100 seeds -> full matrix.
-4. **Failure is data.** Crashes and failed episodes are recorded as structured results.
-5. **Codex-friendly.** Every module has simple interfaces and TODO blocks.
-6. **Paper-first engineering.** The code produces the artifacts needed for a journal paper.
-
-## Recommended first milestone
-
-In the first 48 hours, aim to complete:
-
-- mock smoke test passing;
-- tiny matrix passing;
-- report generated from result files;
-- README commands verified;
-- project pushed to GitHub;
-- Codex assigned to replace mock environment with ManiSkill wrapper.
-
-## Suggested paper contribution claims
-
-Use only after supported by actual experiments:
-
-1. A modular stress-testing framework for language-conditioned manipulation pipelines.
-2. A four-part perturbation taxonomy: semantic, visual, geometric, and execution stressors.
-3. A unified failure taxonomy and oracle-gap analysis for executable 3D targets.
-4. Large-scale evidence that clean-setting success rates can hide severe fragility under RGB-D and execution perturbations.
-
-## Safety and ethics
-
-This project does not claim real-robot validation unless real-robot or real-sensor experiments are actually performed. It is explicitly positioned as a simulation-based diagnostic benchmark.
+EmbodiedStressBench is a diagnostic study of query-to-3D-target generation. It
+does not claim calibrated closed-loop manipulation performance or real-robot
+deployment robustness.

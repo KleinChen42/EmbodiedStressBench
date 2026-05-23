@@ -1,6 +1,11 @@
 $ErrorActionPreference = "Stop"
 
 $files = @(
+  "README.md",
+  "README_REPRODUCIBILITY.md",
+  ".env.local.example",
+  "docs/scirep_data_code_release_checklist.md",
+  "paper/scientific_reports/README.md",
   "paper/scientific_reports/main.tex",
   "paper/scientific_reports/sections/data_availability.tex",
   "paper/scientific_reports/sections/code_availability.tex",
@@ -13,6 +18,8 @@ $files = @(
   "scripts/generate_scirep_revision_assets.py",
   "scientific_reports_revision_20260521/chatgpt_pro_review_prompt_20260523.md",
   "scientific_reports_revision_20260521/git_push_scirep_fixes_20260523.ps1",
+  "scientific_reports_revision_20260521/release_package/CODE_DATA_RELEASE_METADATA.md",
+  "scientific_reports_revision_20260521/release_package/README_REPRODUCIBILITY.md",
   "scientific_reports_revision_20260521/release_package/paper/scientific_reports/main.tex",
   "scientific_reports_revision_20260521/release_package/paper/scientific_reports/sections/data_availability.tex",
   "scientific_reports_revision_20260521/release_package/paper/scientific_reports/sections/code_availability.tex",
