@@ -26,6 +26,8 @@ DISPLAY = {
     "object_label": "Object-label template",
     "category": "Category template",
     "label_phrase": "Label phrase",
+    "true_name": "True name",
+    "true_name_phrase": "True-name phrase",
 }
 
 
@@ -154,7 +156,7 @@ def _write_detector_table(df: pd.DataFrame, tables_dir: Path) -> None:
     lines = [
         r"\begin{table*}[t]",
         r"\centering",
-        r"\caption{Open-vocabulary detector bridge results for Scientific Reports. Rates are percentages. The YCB/clutter held-out run exposes a detector-query mismatch: GroundingDINO produces no usable detections under the generic target-object query, while metadata and first-detection controls remain executable.}",
+        r"\caption{Open-vocabulary detector bridge results for Scientific Reports. Rates are percentages. This table uses detector-valid Bridge v2 rows with recorded GroundingDINO debug fields; the separate YCB/clutter query check is reported in Table~\ref{tab:scirep-query-ablation}.}",
         r"\label{tab:scirep-open-vocab-transfer}",
         r"\scriptsize",
         r"\begin{tabular}{llrrrr}",
@@ -228,10 +230,11 @@ def _write_query_ablation_table(query_root: Path, tables_dir: Path, revision_dir
         episodes = pd.read_csv(episode_path, usecols=["query_variant", "query_used"])
         for variant, group in episodes.groupby("query_variant"):
             values = sorted({str(v) for v in group["query_used"].dropna().unique()})
-            actual_queries[str(variant)] = "; ".join(values[:3])
+            shown = "; ".join(values[:2])
+            actual_queries[str(variant)] = shown + ("; ..." if len(values) > 2 else "")
 
     rows = []
-    variant_order = ["generic", "object_label", "category", "label_phrase"]
+    variant_order = ["generic", "object_label", "category", "label_phrase", "true_name", "true_name_phrase"]
     detector_order = ["GroundingDINO", "metadata query-aware"]
     for variant in variant_order:
         for detector in detector_order:
@@ -263,7 +266,7 @@ def _write_query_ablation_table(query_root: Path, tables_dir: Path, revision_dir
     lines = [
         r"\begin{table*}[t]",
         r"\centering",
-        r"\caption{GroundingDINO query-ablation on YCB/clutter. Rates are percentages for crop-median target lifting. Template-based variants collapse to generic object-level prompts in the current ManiSkill adapter, so the table tests detector-query sensitivity rather than full object-name prompting.}",
+        r"\caption{GroundingDINO query-ablation on YCB/clutter. Rates are percentages for crop-median target lifting. True-name rows are included only when the deep identity probe resolves non-generic YCB object names; otherwise the table should be interpreted as an adapter-label/query-mismatch audit.}",
         r"\label{tab:scirep-query-ablation}",
         r"\scriptsize",
         r"\begin{tabular}{lllrrrr}",
@@ -294,12 +297,11 @@ Input root: `{query_root}`
 
 ## Interpretation
 
-The ablation removes the previous no-detection artifact but GroundingDINO remains
-dominated by wrong-detection failures on YCB/clutter. Template variants do not
-recover object-specific prompting because the current ManiSkill adapter exposes
-generic labels (`target object` / `object`) for these tasks. The paper should
-therefore claim detector-query sensitivity and adapter-metadata limitations, not
-full object-name prompt recovery.
+The ablation audits whether generic prompts, resolved true names, or true-name
+phrases change the YCB/clutter detector bridge. If GroundingDINO remains at
+high no-detection or wrong-detection rates, the paper should describe this as a
+detector-query/domain and adapter-label limitation, not as a detector leaderboard
+or a broad claim about all YCB recognition.
 """
         (revision_dir / "query_ablation_audit.md").write_text(audit, encoding="utf-8")
 
@@ -334,7 +336,12 @@ def _write_closed_loop_table(root: Path, tables_dir: Path) -> None:
 
 
 def _write_closed_loop_v2_table(tables_dir: Path) -> None:
-    root = Path("outputs/scirep_closed_loop_oracle_calibration_v2_20260521/smoke")
+    root = Path("outputs/scirep_closed_loop_oracle_gate_audit_200_20260521")
+    fallback_root = Path("outputs/scirep_closed_loop_oracle_calibration_v2_20260521/smoke")
+    title = "Scripted execution oracle-gate audit"
+    if not (root / "closed_loop_sanity_summary.csv").exists():
+        root = fallback_root
+        title = "Closed-loop oracle calibration v2 gate"
     if not (root / "closed_loop_sanity_summary.csv").exists():
         return
     summary = pd.read_csv(root / "closed_loop_sanity_summary.csv").iloc[0]
@@ -342,24 +349,33 @@ def _write_closed_loop_v2_table(tables_dir: Path) -> None:
     gate.to_csv(tables_dir / "closed_loop_oracle_calibration_v2_gate.csv", index=False)
     rows = []
     for _, row in gate.iterrows():
-        rows.append((row["task"], int(row["oracle_episodes"]), 100 * float(row["oracle_task_success_rate"])))
+        rows.append(
+            (
+                row["task"],
+                int(row["oracle_episodes"]),
+                100 * float(row["oracle_task_success_rate"]),
+                100 * float(row.get("oracle_task_success_ci_low", row["oracle_task_success_rate"])),
+                100 * float(row.get("oracle_task_success_ci_high", row["oracle_task_success_rate"])),
+                str(row.get("dominant_failure_type", "n/a")).replace("_", " "),
+            )
+        )
     lines = [
         r"\begin{table}[t]",
         r"\centering",
-        r"\caption{Closed-loop oracle calibration v2 gate. The oracle scripted executor remains below the pre-registered task-success thresholds, so no positive execution-calibration claim is made.}",
+        rf"\caption{{{title}. The oracle scripted executor remains below the pre-registered task-success thresholds, so no positive execution-calibration claim is made. Wilson 95\% confidence intervals are reported for task success.}}",
         r"\label{tab:closed-loop-v2-gate}",
         r"\scriptsize",
-        r"\begin{tabular}{lrr}",
+        r"\begin{tabular}{lrrl}",
         r"\toprule",
-        r"Task & Oracle episodes & Oracle task success \\",
+        r"Task & Episodes & Task success (95\% CI) & Dominant failure \\",
         r"\midrule",
     ]
-    for task, episodes, success in rows:
-        lines.append(f"{task} & {episodes} & {success:.1f} \\\\")
+    for task, episodes, success, lo, hi, failure in rows:
+        lines.append(f"{task} & {episodes} & {success:.1f} [{lo:.1f}, {hi:.1f}] & {failure} \\\\")
     lines.extend(
         [
             r"\midrule",
-            f"Total & {int(summary['completed_episodes'])} & {100*float(summary['oracle_task_success_rate']):.1f} \\\\",
+            f"Total & {int(summary['completed_episodes'])} & {100*float(summary['oracle_task_success_rate']):.1f} & gate failed \\\\",
             r"\bottomrule",
             r"\end{tabular}",
             r"\end{table}",
@@ -370,6 +386,44 @@ def _write_closed_loop_v2_table(tables_dir: Path) -> None:
 
 
 def _write_target_name_probe_table(tables_dir: Path, revision_dir: Path) -> None:
+    deep_summary = Path("outputs/ycb_target_identity_deep_probe_20260521_r4/target_identity_deep_probe_summary.csv")
+    if deep_summary.exists():
+        raw = pd.read_csv(deep_summary)
+        out = pd.DataFrame(
+            {
+                "task": raw["task"],
+                "probe_rows": raw["probe_rows"],
+                "non_generic_target_label_rows": raw["resolved_object_name_rows"],
+                "non_generic_debug_rows": raw["resolved_object_name_rows"],
+                "most_common_target_label": raw["unique_resolved_names"],
+                "name_examples": raw["unique_resolved_names"].map(
+                    lambda s: ", ".join(str(s).split(", ")[:4]) + ("; ..." if len(str(s).split(", ")) > 4 else "")
+                ),
+                "true_name_ablation_allowed": raw["true_name_ablation_allowed"],
+            }
+        )
+        out.to_csv(tables_dir / "target_name_probe_summary.csv", index=False)
+        out.to_csv(revision_dir / "target_name_probe_summary.csv", index=False)
+        lines = [
+            r"\begin{table}[t]",
+            r"\centering",
+            r"\caption{YCB/clutter deep target-identity probe. A true object-name prompt ablation is claimable only when non-generic names are resolved from the simulator adapter.}",
+            r"\label{tab:target-name-probe}",
+            r"\scriptsize",
+            r"\begin{tabular}{lrrl}",
+            r"\toprule",
+            r"Task & Rows & Resolved names & Example names \\",
+            r"\midrule",
+        ]
+        for _, row in out.iterrows():
+            lines.append(
+                f"{row['task']} & {int(row['probe_rows'])} & {int(row['non_generic_target_label_rows'])} & "
+                f"{row['name_examples']} \\\\"
+            )
+        lines.extend([r"\bottomrule", r"\end{tabular}", r"\end{table}", ""])
+        (tables_dir / "target_name_probe_summary.tex").write_text("\n".join(lines), encoding="utf-8")
+        return
+
     path = Path("outputs/ycb_true_name_probe_20260521/target_name_probe.csv")
     if not path.exists():
         return
@@ -416,68 +470,119 @@ def _write_detector_figure(df: pd.DataFrame, figures_dir: Path) -> None:
     focus = focus[focus["detector"].isin(["metadata query-aware", "first detection", "GroundingDINO"])].copy()
     # crop_median and crop_trimmed are identical in current runs; keep crop_median for readability.
     focus = focus[focus["target_source"] == "crop_median_depth"]
-    pivot = focus.pivot_table(index="detector", columns="run", values="success_rate", aggfunc="mean")
-    order = ["metadata query-aware", "first detection", "GroundingDINO"]
-    pivot = pivot.reindex(order)
-    ax = pivot.rename(index=_display, columns=_display).plot(kind="bar", figsize=(6.8, 3.6), width=0.72)
-    ax.set_ylabel("Success rate")
-    ax.set_ylim(0, 1.05)
-    ax.set_xlabel("")
-    ax.grid(axis="y", alpha=0.25)
-    ax.legend(frameon=False, loc="upper right")
-    ax.set_title("Detector transfer under crop-median target lifting")
-    plt.xticks(rotation=20, ha="right")
-    plt.tight_layout()
-    plt.savefig(figures_dir / "open_vocab_detector_transfer_success.pdf", bbox_inches="tight")
-    plt.savefig(figures_dir / "open_vocab_detector_transfer_success.png", dpi=240, bbox_inches="tight")
-    plt.close()
-
-    pivot_no = focus.pivot_table(index="detector", columns="run", values="no_detection_rate", aggfunc="mean")
-    pivot_no = pivot_no.reindex(order)
-    ax = pivot_no.rename(index=_display, columns=_display).plot(kind="bar", figsize=(6.8, 3.6), width=0.72)
-    ax.set_ylabel("No-detection rate")
-    ax.set_ylim(0, 1.05)
-    ax.set_xlabel("")
-    ax.grid(axis="y", alpha=0.25)
-    ax.legend(frameon=False, loc="upper right")
-    ax.set_title("No-detection failure exposed by YCB/clutter held-out")
-    plt.xticks(rotation=20, ha="right")
-    plt.tight_layout()
-    plt.savefig(figures_dir / "open_vocab_detector_transfer_no_detection.pdf", bbox_inches="tight")
-    plt.savefig(figures_dir / "open_vocab_detector_transfer_no_detection.png", dpi=240, bbox_inches="tight")
-    plt.close()
+    detectors = ["metadata query-aware", "first detection", "GroundingDINO"]
+    preferred_runs = ["open_vocab_bridge_v2", "open_vocab_bridge_v2_ycb_clutter_heldout"]
+    runs = [run for run in preferred_runs if run in set(focus["run"].astype(str))]
+    source_cols = [
+        "run",
+        "detector",
+        "target_source",
+        "success_rate",
+        "success_ci_low",
+        "success_ci_high",
+        "no_detection_rate",
+        "no_detection_ci_low",
+        "no_detection_ci_high",
+        "wrong_detection_rate",
+        "wrong_detection_ci_low",
+        "wrong_detection_ci_high",
+    ]
+    focus[[c for c in source_cols if c in focus]].to_csv(
+        figures_dir / "open_vocab_detector_transfer_combined_source.csv",
+        index=False,
+    )
+    metric_specs = [
+        ("success_rate", "success_ci_low", "success_ci_high", "Diagnostic success"),
+        ("no_detection_rate", "no_detection_ci_low", "no_detection_ci_high", "No detection"),
+        ("wrong_detection_rate", "wrong_detection_ci_low", "wrong_detection_ci_high", "Wrong detection"),
+    ]
+    colors = {
+        "metadata query-aware": "#4e79a7",
+        "first detection": "#f28e2b",
+        "GroundingDINO": "#e15759",
+    }
+    fig, axes = plt.subplots(1, 3, figsize=(9.2, 3.0), sharey=True)
+    x = np.arange(len(runs), dtype=float)
+    width = 0.22
+    for ax, (metric, low_col, high_col, title) in zip(axes, metric_specs):
+        for offset_idx, detector in enumerate(detectors):
+            vals: list[float] = []
+            lows: list[float] = []
+            highs: list[float] = []
+            for run in runs:
+                row = focus[(focus["run"].eq(run)) & (focus["detector"].eq(detector))]
+                if row.empty:
+                    vals.append(np.nan)
+                    lows.append(np.nan)
+                    highs.append(np.nan)
+                    continue
+                value = float(row[metric].iloc[0])
+                vals.append(value)
+                lo = float(row[low_col].iloc[0]) if low_col in row and not pd.isna(row[low_col].iloc[0]) else value
+                hi = float(row[high_col].iloc[0]) if high_col in row and not pd.isna(row[high_col].iloc[0]) else value
+                lows.append(max(0.0, value - lo))
+                highs.append(max(0.0, hi - value))
+            pos = x + (offset_idx - 1) * width
+            ax.bar(pos, vals, width=width, color=colors[detector], label=_display(detector))
+            ax.errorbar(pos, vals, yerr=[lows, highs], fmt="none", ecolor="#1f2937", elinewidth=0.8, capsize=2)
+        ax.set_title(title, fontsize=8.5, weight="bold")
+        ax.set_xticks(x)
+        ax.set_xticklabels([_display(run) for run in runs])
+        ax.set_ylim(0, 1.05)
+        ax.grid(axis="y", alpha=0.22)
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+    axes[0].set_ylabel("Rate")
+    axes[0].legend(frameon=False, fontsize=7, loc="upper left")
+    fig.suptitle("Detector bridge under crop-median target lifting", fontsize=10, weight="bold")
+    fig.tight_layout(rect=[0, 0, 1, 0.93])
+    fig.savefig(figures_dir / "open_vocab_detector_transfer_combined.pdf", bbox_inches="tight")
+    fig.savefig(figures_dir / "open_vocab_detector_transfer_combined.png", dpi=300, bbox_inches="tight")
+    plt.close(fig)
 
 
 def _write_protocol_schematic(figures_dir: Path) -> None:
     labels = [
-        ("Language query", "target object / object name"),
-        ("Detector or selector", "metadata, first detection, GroundingDINO"),
-        ("RGB-D target source", "box center, crop median, trimmed median"),
-        ("Parameterized stressor", "list ambiguity, occlusion, depth, offset"),
-        ("Diagnostic output", "3D error, success, failure type, oracle gap"),
+        ("Language\nquery", "target object\nobject name"),
+        ("Detector /\nselector", "metadata\nGroundingDINO"),
+        ("RGB-D target\nsource", "box center\ncrop median"),
+        ("Stressor /\naudit", "list ambiguity\nocclusion, depth"),
+        ("Diagnostic\noutput", "target error\nfailure type"),
     ]
-    fig, ax = plt.subplots(figsize=(7.2, 2.1))
+    fig, ax = plt.subplots(figsize=(9.0, 2.7))
     ax.axis("off")
-    xs = [0.04, 0.25, 0.47, 0.68, 0.89]
+    xs = [0.10, 0.30, 0.50, 0.70, 0.90]
+    width = 0.15
     for idx, ((title, subtitle), x) in enumerate(zip(labels, xs)):
-        ax.text(
-            x,
-            0.62,
-            title,
-            ha="center",
-            va="center",
-            fontsize=8.5,
-            weight="bold",
-            bbox={"boxstyle": "round,pad=0.35", "facecolor": "#eff6ff", "edgecolor": "#60a5fa"},
+        rect = Rectangle(
+            (x - width / 2, 0.36),
+            width,
+            0.42,
+            facecolor="#eff6ff",
+            edgecolor="#2563eb",
+            linewidth=1.2,
         )
-        ax.text(x, 0.30, subtitle, ha="center", va="center", fontsize=6.7, color="#334155", wrap=True)
+        ax.add_patch(rect)
+        ax.text(x, 0.60, title, ha="center", va="center", fontsize=10.5, weight="bold", linespacing=1.05)
+        ax.text(x, 0.18, subtitle, ha="center", va="center", fontsize=8.5, color="#334155", linespacing=1.15)
         if idx < len(xs) - 1:
             ax.annotate(
                 "",
-                xy=(xs[idx + 1] - 0.08, 0.62),
-                xytext=(x + 0.08, 0.62),
-                arrowprops={"arrowstyle": "->", "lw": 1.2, "color": "#475569"},
+                xy=(xs[idx + 1] - width / 2 - 0.015, 0.57),
+                xytext=(x + width / 2 + 0.015, 0.57),
+                arrowprops={"arrowstyle": "->", "lw": 1.4, "color": "#475569"},
             )
+    ax.text(
+        0.5,
+        0.02,
+        "Examples: metadata/first-detection/GroundingDINO selectors; oracle/box-center/crop-median targets; target error, success, oracle gap and failure labels.",
+        ha="center",
+        va="bottom",
+        fontsize=8.0,
+        color="#475569",
+    )
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
     fig.tight_layout()
     fig.savefig(figures_dir / "protocol_schematic.pdf", bbox_inches="tight")
     fig.savefig(figures_dir / "protocol_schematic.png", dpi=300, bbox_inches="tight")
@@ -506,6 +611,32 @@ def _write_experiment_design_table(tables_dir: Path) -> None:
         lines.append(" & ".join(row) + r" \\")
     lines.extend([r"\bottomrule", r"\end{tabular}", r"\end{table*}", ""])
     (tables_dir / "experiment_design_summary.tex").write_text("\n".join(lines), encoding="utf-8")
+
+
+def _write_claim_support_matrix(tables_dir: Path) -> None:
+    rows = [
+        ("Parameterized stressors expose target-generation failures", "Main sweeps + oracle-gap tables", "Supported", "Main diagnostic claim"),
+        ("Crop-median depth is universally best", "Threshold sensitivity", "Not supported", "Replaced by precision--robustness tradeoff"),
+        ("Open-vocabulary modules can be audited by the protocol", "Bridge v2 + YCB/clutter checks", "Supported with scope", "Detector-query and adapter-label failure modes"),
+        ("GroundingDINO generally fails on YCB/clutter", "Current generic-query evidence", "Not claimed", "Bounded to current query/adapter setup"),
+        ("Diagnostic success predicts scripted task success", "Closed-loop oracle audit", "Not supported", "Claim boundary / limitation"),
+        ("Benchmark is real-robot validated", "No real-robot evidence", "Not claimed", "Simulation-only limitation"),
+    ]
+    lines = [
+        r"\begin{table*}[t]",
+        r"\centering",
+        r"\caption{Claim-support matrix used to keep the Scientific Reports manuscript aligned with completed evidence.}",
+        r"\label{tab:claim-support-matrix}",
+        r"\scriptsize",
+        r"\begin{tabular}{llll}",
+        r"\toprule",
+        r"Claim & Evidence & Status & Manuscript use \\",
+        r"\midrule",
+    ]
+    for row in rows:
+        lines.append(" & ".join(row) + r" \\")
+    lines.extend([r"\bottomrule", r"\end{tabular}", r"\end{table*}", ""])
+    (tables_dir / "claim_support_matrix.tex").write_text("\n".join(lines), encoding="utf-8")
 
 
 def _write_oracle_success_table(tables_dir: Path) -> None:
@@ -538,16 +669,17 @@ def _write_oracle_success_table(tables_dir: Path) -> None:
     (tables_dir / "oracle_diagnostic_success_summary.tex").write_text("\n".join(lines), encoding="utf-8")
 
 
-def _load_episode_indices(root: Path) -> pd.DataFrame:
+def _load_episode_indices(root: Path, query_root: Path) -> pd.DataFrame:
     paths = [
-        root / "open_vocab_bridge_v2" / "open_vocab_bridge_v2_episode_index.csv",
-        root / "open_vocab_bridge_v2_ycb_clutter_heldout" / "open_vocab_bridge_v2_episode_index.csv",
+        (root / "open_vocab_bridge_v2" / "open_vocab_bridge_v2_episode_index.csv", "Bridge v2"),
+        (query_root / "open_vocab_bridge_v2_episode_index.csv", "True-name query ablation"),
+        (root / "open_vocab_bridge_v2_ycb_clutter_heldout" / "open_vocab_bridge_v2_episode_index.csv", "YCB/clutter held-out"),
     ]
     frames = []
-    for path in paths:
+    for path, evidence_set in paths:
         if path.exists():
             frame = pd.read_csv(path)
-            frame["evidence_set"] = "YCB/clutter held-out" if "ycb_clutter" in str(path) else "Bridge v2"
+            frame["evidence_set"] = evidence_set
             frames.append(frame)
     if not frames:
         return pd.DataFrame()
@@ -585,7 +717,12 @@ def _select_qualitative_cases(df: pd.DataFrame) -> pd.DataFrame:
         sort_by="target_error_l2",
         ascending=False,
     )
-    add("No detection", df[(~success) & df["failure_type"].astype(str).eq("no_detection")])
+    no_detection = df[(~success) & df["failure_type"].astype(str).eq("no_detection")]
+    if "has_grounding_dino_debug" in no_detection:
+        with_debug = no_detection[no_detection["has_grounding_dino_debug"].astype(str).str.lower().eq("true")]
+        add("No detection", with_debug if not with_debug.empty else no_detection)
+    else:
+        add("No detection", no_detection)
     add("Depth invalid", df[(~success) & df["failure_type"].astype(str).eq("depth_invalid")])
     add("Large target error", df[(~success) & target_error.notna()], sort_by="target_error_l2", ascending=False)
     add(
@@ -672,30 +809,68 @@ def _write_main_qualitative_from_renders(figures_dir: Path) -> None:
             images.append((title, matches[0]))
     if len(images) < 2:
         return
-    fig, axes = plt.subplots(2, 2, figsize=(8.8, 6.2), squeeze=False)
+    manifest_path = Path("scientific_reports_revision_20260521/qualitative_case_manifest.csv")
+    manifest = pd.read_csv(manifest_path) if manifest_path.exists() else pd.DataFrame()
+    case_rows = {str(row.get("case_label")): row for _, row in manifest.iterrows()}
+    fig, axes = plt.subplots(2, 2, figsize=(8.8, 6.8), squeeze=False)
     for ax in axes.ravel():
         ax.axis("off")
     for ax, (label, path) in zip(axes.ravel(), images):
-        ax.imshow(plt.imread(path))
-        ax.set_title(label, fontsize=9, weight="bold")
+        image = plt.imread(path)
+        crop_width = min(image.shape[1], 740)
+        ax.imshow(image[:, :crop_width])
+        case_key = "Low IoU but 3D success" if label == "Low IoU, valid 3D" else label
+        row = case_rows.get(case_key, {})
+        failure = _display(row.get("failure_type", ""))
+        error = row.get("target_error_l2", "")
+        if error != "" and not pd.isna(error):
+            error_text = f"{float(error):.3f} m"
+        else:
+            error_text = "n/a"
+        title = f"{label}\nerror={error_text}; failure={failure}"
+        ax.set_title(title, fontsize=9.5, weight="bold")
         ax.axis("off")
+    fig.text(
+        0.5,
+        0.01,
+        "Green boxes denote oracle target regions; red boxes denote selected regions. Full per-case metadata are in the qualitative manifest.",
+        ha="center",
+        fontsize=8,
+        color="#475569",
+    )
     fig.tight_layout()
     fig.savefig(figures_dir / "maniskill_qualitative_main_figure.pdf", bbox_inches="tight")
     fig.savefig(figures_dir / "maniskill_qualitative_main_figure.png", dpi=300, bbox_inches="tight")
     plt.close(fig)
 
 
-def _write_result_to_claim(root: Path, out_docs: Path) -> None:
+def _write_result_to_claim(root: Path, out_docs: Path, query_root: Path) -> None:
     bridge = pd.read_csv(root / "open_vocab_bridge_v2" / "open_vocab_bridge_v2_summary.csv").iloc[0]
     held = pd.read_csv(root / "open_vocab_bridge_v2_ycb_clutter_heldout" / "open_vocab_bridge_v2_summary.csv").iloc[0]
     closed = pd.read_csv(root / "closed_loop_sanity_smoke" / "closed_loop_sanity_summary.csv").iloc[0]
     v2_summary_path = Path("outputs/scirep_closed_loop_oracle_calibration_v2_20260521/smoke/closed_loop_sanity_summary.csv")
     closed_v2 = pd.read_csv(v2_summary_path).iloc[0] if v2_summary_path.exists() else None
+    audit_summary_path = Path("outputs/scirep_closed_loop_oracle_gate_audit_200_20260521/closed_loop_sanity_summary.csv")
+    closed_audit = pd.read_csv(audit_summary_path).iloc[0] if audit_summary_path.exists() else None
+    query_summary_path = query_root / "open_vocab_bridge_v2_summary.csv"
+    query_summary = pd.read_csv(query_summary_path).iloc[0] if query_summary_path.exists() else None
     by_detector = pd.read_csv(root / "open_vocab_bridge_v2_ycb_clutter_heldout" / "open_vocab_bridge_v2_by_detector_target_source.csv")
     gdino_no = by_detector[by_detector["detector"] == "GroundingDINO"]["no_detection_rate"].mean()
     closed_v2_row = ""
     if closed_v2 is not None:
         closed_v2_row = f"| Closed-loop oracle calibration v2 | {int(closed_v2['completed_episodes'])}/{int(closed_v2['expected_episodes'])} | {closed_v2['complete']} | {int(closed_v2['duplicate_result_count'])} | {int(closed_v2['runner_exception_count'])} | Oracle task success remained below gate ({float(closed_v2['oracle_task_success_rate']):.3f}); execution calibration remains unresolved |\n"
+    closed_audit_row = ""
+    if closed_audit is not None:
+        closed_audit_row = f"| Closed-loop 200-episode oracle-gate audit | {int(closed_audit['completed_episodes'])}/{int(closed_audit['expected_episodes'])} | {closed_audit['complete']} | {int(closed_audit['duplicate_result_count'])} | {int(closed_audit['runner_exception_count'])} | Larger oracle audit remains below gate ({float(closed_audit['oracle_task_success_rate']):.3f}); use as claim boundary |\n"
+    query_row = ""
+    query_debug_note = ""
+    if query_summary is not None:
+        query_row = f"| True-name YCB/clutter query ablation | {int(query_summary['completed_episodes'])}/{int(query_summary['expected_episodes'])} | {query_summary['complete']} | {int(query_summary['duplicate_result_count'])} | {int(query_summary['runner_exception_count'])} | True-name prompts make the detector runnable but wrong detections remain the dominant failure mode |\n"
+        query_debug_note = (
+            f"The true-name ablation has GroundingDINO debug fields for "
+            f"{int(query_summary['grounding_dino_rows_with_debug'])}/{int(query_summary['grounding_dino_rows'])} rows, "
+            f"with no-detection rate {float(query_summary['no_detection_rate']):.3f}."
+        )
 
     text = f"""# Scientific Reports Result-to-Claim Gate
 
@@ -712,9 +887,11 @@ support a positive claim about scripted execution success calibration.
 | Evidence set | Episodes | Complete | Duplicate count | Runner exceptions | Key finding |
 | --- | ---: | --- | ---: | ---: | --- |
 | Open-Vocab Bridge v2 | {int(bridge['completed_episodes'])}/{int(bridge['expected_episodes'])} | {bridge['complete']} | {int(bridge['duplicate_result_count'])} | {int(bridge['runner_exception_count'])} | Learned detector plug-in is runnable and produces detector-specific target-generation failures |
-| YCB/clutter held-out bridge | {int(held['completed_episodes'])}/{int(held['expected_episodes'])} | {held['complete']} | {int(held['duplicate_result_count'])} | {int(held['runner_exception_count'])} | Generic open-vocabulary detector transfer fails through no-detection on YCB/clutter |
+| YCB/clutter held-out bridge | {int(held['completed_episodes'])}/{int(held['expected_episodes'])} | {held['complete']} | {int(held['duplicate_result_count'])} | {int(held['runner_exception_count'])} | Auxiliary held-out stress run; not used for detector-valid claims because GroundingDINO debug fields are absent |
 | Closed-loop smoke | {int(closed['completed_episodes'])}/{int(closed['expected_episodes'])} | {closed['complete']} | {int(closed['duplicate_result_count'])} | {int(closed['runner_exception_count'])} | Scripted executor gate failed; do not use for positive task-success claims |
 {closed_v2_row}
+{closed_audit_row}
+{query_row}
 
 ## Claim Decisions
 
@@ -722,25 +899,26 @@ support a positive claim about scripted execution success calibration.
 | --- | --- | --- |
 | Parameterized simulation stressors expose target-generation failures | Supported | The benchmark exposes target-source and detector failure modes through controlled stressor sweeps and per-episode artifacts. |
 | Target sources show a precision-vs-robustness tradeoff | Supported | Threshold sensitivity supports a precision--robustness tradeoff; crop-median is not universally strongest under strict thresholds. |
-| Open-vocabulary detectors can be evaluated through the same protocol | Supported with scope | GroundingDINO can be evaluated through the protocol, and the YCB/clutter held-out plus query checks expose detector-query and adapter-label limitations. |
+| Open-vocabulary detectors can be evaluated through the same protocol | Supported with scope | GroundingDINO can be evaluated through the protocol, and Bridge v2 plus the YCB/clutter query check expose detector-query and adapter-label limitations. |
 | Diagnostic target success is informative for scripted execution success | Not supported yet | The current scripted executor smoke failed the oracle task-success gate, so execution calibration remains unresolved. |
 | Failure taxonomy separates wrong detection, invalid depth, target displacement, and execution sensitivity | Supported for diagnostic runs | Failure labels are useful for diagnosis; execution claims require a calibrated executor. |
 
 ## Important Negative Result
 
-In the YCB/clutter held-out bridge, GroundingDINO rows have an average
-no-detection rate of {gdino_no:.3f}. This should be written as a limitation of
-the generic target-object query and current adapter labels, not as a general
-statement that GroundingDINO cannot work on YCB or clutter.
+The large YCB/clutter held-out bridge has an average GroundingDINO no-detection
+rate of {gdino_no:.3f}, but its GroundingDINO debug fields are absent. It should
+therefore remain an auxiliary stress run rather than a detector-valid claim.
 
 ## Query-Ablation Update
 
 The follow-up query ablation completes the prompt-sensitivity check. It removes
 the no-detection artifact but GroundingDINO remains dominated by wrong-detection
-failures on YCB/clutter. A target-name probe found no non-generic target_label
-rows, so a true object-name prompt ablation is not claimable from the current
-adapter. This supports detector-query sensitivity and adapter-metadata
-limitations rather than full object-name prompt recovery.
+failures on YCB/clutter. The deep target-identity probe determines whether a
+true object-name prompt ablation is claimable; if resolved names are available,
+the small ablation is reported as detector-query sensitivity rather than as a
+detector leaderboard.
+
+{query_debug_note}
 
 ## Manuscript Routing
 
@@ -753,15 +931,15 @@ limitations rather than full object-name prompt recovery.
     (out_docs / "scientific_reports_result_to_claim.md").write_text(text, encoding="utf-8")
 
 
-def _write_claim_evidence(root: Path, out_docs: Path) -> None:
-    text = """# Scientific Reports Claim-Evidence Table
+def _write_claim_evidence(root: Path, out_docs: Path, query_root: Path) -> None:
+    text = f"""# Scientific Reports Claim-Evidence Table
 
 | Claim | Verdict | Evidence source | Paper wording |
 | --- | --- | --- | --- |
 | Parameterized simulation stressors expose target-generation failures | Supported | Main v1, held-out, hard L3, detection-list ambiguity, and Bridge v2 artifacts | "stressors expose target-generation and detector failure modes" |
 | Target sources show a precision-vs-robustness tradeoff | Supported | Threshold sensitivity and target-error analyses | "crop-median is robust at default/relaxed thresholds; box-center is more precise under strict thresholds" |
-| Open-vocabulary detectors can be evaluated through the same protocol | Supported with scope | `outputs/scirep_overnight_20260520_analysis/open_vocab_bridge_v2*`; `outputs/scirep_query_ablation_20260521`; `outputs/ycb_true_name_probe_20260521` | "GroundingDINO can be plugged in, and YCB/clutter exposes detector-query sensitivity and adapter-label limitations" |
-| Diagnostic target success predicts scripted execution success | Not supported | `outputs/scirep_overnight_20260520_analysis/closed_loop_sanity_smoke`; `outputs/scirep_closed_loop_oracle_calibration_v2_20260521` | "scripted execution calibration remains unresolved" |
+| Open-vocabulary detectors can be evaluated through the same protocol | Supported with scope | `outputs/scirep_overnight_20260520_analysis/open_vocab_bridge_v2*`; `outputs/ycb_target_identity_deep_probe_20260521_r4`; `{query_root}` | "GroundingDINO can be plugged in, and YCB/clutter exposes detector-query sensitivity and adapter-label limitations" |
+| Diagnostic target success predicts scripted execution success | Not supported | `outputs/scirep_overnight_20260520_analysis/closed_loop_sanity_smoke`; `outputs/scirep_closed_loop_oracle_calibration_v2_20260521`; `outputs/scirep_closed_loop_oracle_gate_audit_200_20260521` | "scripted execution calibration remains unresolved" |
 | Failure taxonomy separates wrong detection, invalid depth, displacement, and execution sensitivity | Supported for diagnostic runs | failure-distribution tables and qualitative case manifest | "failure taxonomy supports diagnostic triage, not causal proof beyond logged artifacts" |
 
 ## Claim Boundaries
@@ -781,7 +959,7 @@ def main() -> None:
     parser.add_argument("--revision-dir", default="scientific_reports_revision_20260521")
     parser.add_argument("--paper-dir", default="paper/scientific_reports")
     parser.add_argument("--docs-dir", default="docs")
-    parser.add_argument("--query-root", default="outputs/scirep_query_ablation_20260521")
+    parser.add_argument("--query-root", default="outputs/scirep_true_name_ablation_small_20260521_r7")
     args = parser.parse_args()
 
     root = Path(args.analysis_root)
@@ -796,10 +974,11 @@ def main() -> None:
 
     bridge = _load_bridge(root, "open_vocab_bridge_v2")
     held = _load_bridge(root, "open_vocab_bridge_v2_ycb_clutter_heldout")
-    combined = pd.concat([bridge, held], ignore_index=True)
+    combined = bridge.copy()
     combined.to_csv(revision / "scirep_open_vocab_detector_transfer_combined.csv", index=False)
     _write_protocol_schematic(figures)
     _write_experiment_design_table(tables)
+    _write_claim_support_matrix(tables)
     _write_oracle_success_table(tables)
     _write_detector_table(combined, tables)
     _write_query_ablation_table(query_root, tables, revision)
@@ -807,11 +986,11 @@ def main() -> None:
     _write_closed_loop_v2_table(tables)
     _write_target_name_probe_table(tables, revision)
     _write_detector_figure(combined, figures)
-    episode_index = _load_episode_indices(root)
+    episode_index = _load_episode_indices(root, query_root)
     _write_qualitative_figure(_select_qualitative_cases(episode_index), revision, figures)
     _write_main_qualitative_from_renders(figures)
-    _write_result_to_claim(root, docs)
-    _write_claim_evidence(root, docs)
+    _write_result_to_claim(root, docs, query_root)
+    _write_claim_evidence(root, docs, query_root)
     print(f"Wrote Scientific Reports assets under {revision}, {paper}, and {docs}")
 
 

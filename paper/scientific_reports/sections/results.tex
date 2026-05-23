@@ -33,11 +33,35 @@ The default success threshold is 0.08 m, but the stored target-error values allo
 
 The detector bridge evaluates learned and controlled selectors through the same target-source interface. In Bridge v2, GroundingDINO produces usable detections but has lower diagnostic success than metadata query-aware selection, and its low 2D IoU does not imply absence of all useful 3D evidence. Diagnostic success is computed from lifted 3D target distance, so a detection box can fail a strict 2D IoU criterion while still preserving enough crop depth for a valid target in simple scenes.
 
-The YCB/clutter held-out extension gives the more important Scientific Reports result: GroundingDINO fails through no-detection under the generic target-object query, while metadata-assisted and first-detection controls remain executable (Table~\ref{tab:scirep-open-vocab-transfer}). This is written as a detector-query and adapter-label limitation in the benchmark, not as a general claim that GroundingDINO cannot localize YCB or clutter objects. The result strengthens the benchmark claim because the same artifact schema captures success, no-detection, wrong-detection, and target-error outcomes across controlled and learned selectors.
+The detector-valid Bridge v2 rows show that GroundingDINO can be plugged into the same protocol and produces explicit detector-specific failure modes rather than requiring a separate evaluation stack (Table~\ref{tab:scirep-open-vocab-transfer}). We write these outcomes as detector-query and adapter-label limitations in the benchmark, not as a general claim that GroundingDINO cannot localize YCB or clutter objects. The result strengthens the benchmark claim because the same artifact schema captures success, no-detection, wrong-detection, and target-error outcomes across controlled and learned selectors.
 
 \input{tables/open_vocab_detector_transfer_summary}
 
-We therefore ran a targeted query ablation on YCB/clutter to test whether the held-out failure was only a prompt artifact. The ablation completed 3,840 episodes without duplicate files or runner exceptions. It removes the previous no-detection mode, but GroundingDINO remains dominated by wrong-detection failures (Table~\ref{tab:scirep-query-ablation}). We also probed whether the ManiSkill adapter exposed true YCB object names for a stricter object-name prompt ablation. It did not: target labels remained generic in the current adapter (Table~\ref{tab:target-name-probe}). The query experiment therefore supports detector-query sensitivity and adapter-metadata limitations, rather than proving recovery with true object-name prompts.
+\subsection{External real RGB-D validation separates detector and lifting failures}
+
+To test whether the diagnostic logic is only a ManiSkill artifact, we added an external RGB-D probe on the full YCB-V/BOP test split with ground-truth visible masks and boxes. This probe does not evaluate robot execution. Instead, it uses the visible-mask median as a 3D reference, then compares oracle masks, oracle 2D boxes, first ground-truth boxes, and GroundingDINO detections through the same RGB-D target sources. The full probe contains 98,567 object instances and 1,577,072 target-generation records per detector-threshold setting. The oracle-mask control reaches 99.97\% success at 8 cm, showing that the reference and depth-lifting machinery are internally consistent. Oracle 2D boxes with crop-trimmed median depth reach 79.9\%, while GroundingDINO with generic prompts reaches 23.8\% and improves to 61.4\% with true object-name prompts (Table~\ref{tab:external-rgbd-validation}; Fig.~\ref{fig:external-rgbd-validation}). Thus, the external probe supports a bounded claim: EmbodiedStressBench can separate RGB-D lifting error from detector/query error on real RGB-D data, but it does not establish real-robot manipulation performance.
+
+\input{tables/external_rgbd_validation_summary}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.98\linewidth]{figures/external_rgbd_validation.png}
+\caption{External real RGB-D validation on YCB-V/BOP. (A) Diagnostic target success at 8 cm separates oracle-mask, oracle-2D-box, list-order, and GroundingDINO query conditions. (B) Threshold sensitivity shows that oracle 2D box target sources retain the precision--robustness structure observed in simulation, while GroundingDINO true-name prompts remain below oracle controls. (C) Failure attribution separates wrong detection from target-error and depth-related outcomes.}
+\label{fig:external-rgbd-validation}
+\end{figure}
+
+We also repeated the full external RGB-D probe under two additional GroundingDINO box/text threshold settings to check whether the detector-query conclusion depends on a single post-processing configuration. The true-name prompt remains substantially above the generic prompt across thresholds: 61.5\% at 0.10/0.10, 61.4\% at 0.20/0.20, and 60.0\% at 0.30/0.25 (Table~\ref{tab:external-rgbd-detector-threshold}; Fig.~\ref{fig:external-rgbd-detector-threshold}). The stricter threshold increases no-detection and slightly reduces true-name success, but it does not change the qualitative result that prompt specificity is a major determinant of detector-to-3D-target success.
+
+\input{tables/external_rgbd_detector_threshold_sensitivity}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.92\linewidth]{figures/external_rgbd_detector_threshold_sensitivity.png}
+\caption{GroundingDINO detector-threshold sensitivity on the full YCB-V/BOP external RGB-D probe. (A) Generic, photo true-name, and true-name prompt success remain separated across post-processing thresholds. (B) For true-name prompts, the stricter 0.30/0.25 threshold increases no-detection while preserving the main detector-query conclusion.}
+\label{fig:external-rgbd-detector-threshold}
+\end{figure}
+
+We therefore ran a targeted query route on YCB/clutter to test whether generic prompts were the only bottleneck. A deep target-identity probe recovered trusted, target-specific YCB names for all probed rows (Table~\ref{tab:target-name-probe}), enabling a 960-episode true-name ablation. After a detector-runtime warmup that restored GroundingDINO debug fields for most learned-detector rows, true-name prompts improved PickSingleYCB relative to the generic query but did not solve the bridge: wrong-detection remained the dominant failure mode, and PickClutterYCB remained especially difficult (Table~\ref{tab:scirep-query-ablation}). The query experiment therefore supports a bounded detector-query/domain and adapter-label limitation, rather than a broad detector leaderboard claim.
 
 \input{tables/query_ablation_summary}
 
@@ -45,24 +69,17 @@ We therefore ran a targeted query ablation on YCB/clutter to test whether the he
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.95\linewidth]{figures/open_vocab_detector_transfer_success.png}
-\caption{Detector bridge diagnostic success by evidence set, detector, and target source. The YCB/clutter extension exposes a sharp transfer failure for the GroundingDINO query setup used in this study.}
-\label{fig:scirep-detector-success}
+\includegraphics[width=0.98\linewidth]{figures/open_vocab_detector_transfer_combined.png}
+\caption{Detector bridge outcomes under crop-median target lifting. Panel A reports diagnostic success, panel B reports no-detection, and panel C reports wrong-detection outcomes, with seed-block bootstrap 95\% confidence intervals. Detector-valid Bridge v2 rows and the YCB/clutter true-name query check expose learned-detector failure modes without treating the detector as a leaderboard target.}
+\label{fig:scirep-detector-bridge}
 \end{figure}
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.95\linewidth]{figures/open_vocab_detector_transfer_no_detection.png}
-\caption{No-detection rates for the same detector bridge. The held-out YCB/clutter setting turns the learned-detector limitation into an explicit failure mode rather than hiding it inside aggregate success.}
-\label{fig:scirep-detector-no-detection}
-\end{figure}
-
-Figure~\ref{fig:scirep-qualitative-cases} shows representative ManiSkill qualitative cases selected from the same CSV/JSON records and re-rendered through the simulator. Each panel includes the RGB render, depth map, selected and oracle bounding boxes when available, query, seed, stressor, target source, target error, and failure label.
+Figure~\ref{fig:scirep-qualitative-cases} shows representative ManiSkill qualitative cases selected from the same CSV/JSON records and re-rendered through the simulator. The main figure keeps only the RGB/depth evidence, selected and oracle bounding boxes when available, target-error value, and failure label; per-case seeds, queries, stressors, target sources, and source files are recorded in the qualitative manifest.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.95\linewidth]{figures/maniskill_qualitative_main_figure.png}
-\caption{ManiSkill RGB/depth qualitative panels selected from completed Bridge v2 and YCB/clutter held-out records. The main text shows four enlarged cases: clean success, wrong detection, no detection, and low-IoU but valid 3D target behavior. Additional rendered cases are provided with the source-data package.}
+\caption{ManiSkill RGB/depth qualitative panels selected from completed Bridge v2 and YCB/clutter true-name query records. The main text shows four enlarged cases: clean success, wrong detection, no detection, and low-IoU but valid 3D target behavior. Full per-case metadata and additional rendered cases are provided with the source-data package.}
 \label{fig:scirep-qualitative-cases}
 \end{figure}
 
@@ -74,6 +91,6 @@ We attempted a scripted closed-loop oracle calibration to test whether diagnosti
 
 \subsection{Relationship to existing benchmarks}
 
-EmbodiedStressBench is complementary to existing simulation and manipulation benchmarks. Table~\ref{tab:benchmark-comparison} summarizes the distinction: the present study diagnoses language-to-target generation with stressor levels, oracle gaps, and failure labels, whereas standard manipulation benchmarks primarily evaluate policies or task completion.
+EmbodiedStressBench is complementary to existing simulation and manipulation benchmarks. The comparison to ManiSkill, CALVIN, SIMPLER, and VLABench is provided in Supplementary Table S2: the present study diagnoses language-to-target generation with stressor levels, oracle gaps, and failure labels, whereas standard manipulation benchmarks primarily evaluate policies or task completion.
 
-\input{tables/benchmark_comparison_table}
+\input{tables/claim_support_matrix}
