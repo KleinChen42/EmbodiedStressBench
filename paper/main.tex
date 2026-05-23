@@ -1,8 +1,9 @@
 % Compatibility root for compilers that automatically build paper/main.tex.
-% Current canonical Scientific Reports draft:
+% Canonical Scientific Reports source:
 %   paper/scientific_reports/main.tex
-% IEEE Access draft remains available at:
-%   paper/ieee_access/main_revised.tex
+%
+% This file intentionally mirrors the Scientific Reports manuscript so that
+% Overleaf's automatic main-file detection cannot compile an obsolete draft.
 
 \documentclass[10pt]{article}
 \usepackage[a4paper,margin=0.78in]{geometry}
@@ -10,6 +11,7 @@
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{hyperref}
+\usepackage{url}
 \usepackage[numbers,sort&compress]{natbib}
 
 \makeatletter
@@ -20,15 +22,15 @@
 \makeatother
 \graphicspath{{\srroot/}{\srroot/figures/}}
 
-\title{EmbodiedStressBench: Reproducible Simulation Stress Tests for Language-to-Target Generation in Robotic Manipulation}
-\author{Zhuo Chen}
+\title{A reproducible diagnostic benchmark for language-to-target generation in robotic manipulation}
+\author{Zhuo Chen\\Correspondence: \href{mailto:zhuoc@chalmers.se}{zhuoc@chalmers.se}}
 \date{}
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-Language-conditioned manipulation systems often hide target-generation failures behind aggregate task success. We present EmbodiedStressBench, a reproducible simulation study for stress-testing the language-query-to-3D-target stage of robotic manipulation. The study separates semantic target selection, RGB-D target lifting, depth and occlusion corruption, and execution-tolerance perturbations through parameterized stressors, per-episode artifacts, oracle-gap analysis, and a failure taxonomy. Across large-scale ManiSkill diagnostic sweeps, target sources show a precision--robustness tradeoff: box-center depth is more precise under strict distance thresholds, while crop-median depth is stronger at the default and relaxed thresholds. A learned-detector bridge shows that open-vocabulary detectors can be evaluated through the same protocol, and a YCB/clutter held-out extension exposes detector-query transfer failure through no-detection outcomes. A scripted closed-loop smoke test did not pass the oracle execution gate, so execution calibration is treated as an unresolved limitation rather than a positive claim. EmbodiedStressBench is therefore positioned as a detector-agnostic diagnostic substrate for reproducible target-generation failure analysis, not as a new closed-loop policy benchmark or real-robot system.
+Language-conditioned manipulation evaluations can obscure failures in converting a query into a 3D target. We present EmbodiedStressBench, a reproducible diagnostic benchmark for the language-to-target stage of robotic manipulation, separating detection-list selection, RGB-D lifting, stressor sensitivity, oracle gaps, and failure labels. In seed-controlled ManiSkill sweeps, target sources showed a threshold-dependent tradeoff: box-center depth was more precise at strict 4--6 cm thresholds, whereas crop-median depth was more robust at the default 8 cm and relaxed 10 cm thresholds. A detector-bridge analysis evaluated metadata-assisted selection, first detection, and one learned GroundingDINO plug-in through the same lifting interface, exposing query, domain, and adapter-label failure modes rather than a detector leaderboard. In the YCB-V/BOP probe, the tested GroundingDINO route improved from 23.8\% success with generic prompts to 61.4\% with true object-name prompts, while oracle-mask lifting reached 99.97\% and oracle 2D boxes with trimmed crop median reached 79.9\% at 8 cm. A scripted execution audit failed the oracle gate; therefore, the benchmark is positioned as a target-generation diagnostic, not a closed-loop policy or real-robot benchmark.
 \end{abstract}
 
 \section{Introduction}
@@ -51,6 +53,18 @@ Language-conditioned manipulation systems often hide target-generation failures 
 
 \section{Code Availability}
 \input{\srroot/sections/code_availability}
+
+\section{Author Contributions}
+Z.C. is the sole author and corresponding author. Z.C. conceived the study, designed and implemented the benchmark, ran the experiments, analyzed the data, prepared the figures and tables, and wrote the manuscript.
+
+\section{Competing Interests}
+The author declares no competing interests.
+
+\section{Funding}
+The author received no specific funding for this work.
+
+\section{Acknowledgements}
+The author acknowledges the open-source software and public dataset communities whose tools and datasets made the reproducible analyses possible, including ManiSkill, YCB-V/BOP, and GroundingDINO.
 
 \bibliographystyle{unsrtnat}
 \bibliography{\srroot/references}

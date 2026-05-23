@@ -2,7 +2,7 @@
 
 Title:
 
-> EmbodiedStressBench: A Reproducible Simulation Diagnostic for Query-Conditioned 3D Target Localization in Robotic Manipulation
+> A reproducible diagnostic benchmark for language-to-target generation in robotic manipulation
 
 Author and correspondence:
 

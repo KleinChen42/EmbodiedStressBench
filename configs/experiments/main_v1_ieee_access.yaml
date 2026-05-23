@@ -1,5 +1,5 @@
 name: main_v1_ieee_access
-description: Main IEEE Access experiment built to JINT-level rigor with harder ManiSkill tasks and distractor/depth/execution stressors.
+description: Main Scientific Reports diagnostic sweep with ManiSkill tasks and controlled distractor, depth, and target-displacement stressors.
 env_backend: maniskill
 tasks:
   - PickCube

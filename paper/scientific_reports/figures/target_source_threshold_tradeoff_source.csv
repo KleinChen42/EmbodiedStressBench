@@ -1,0 +1,17 @@
+run,baseline,threshold_m,success_rate,n,baseline_display
+Heldout,box_center_depth,0.04,0.6719345238095238,33600,Box-center depth
+Heldout,crop_median_depth,0.04,0.2266071428571428,33600,Crop-median depth
+Heldout,crop_top_surface,0.04,0.2630357142857142,33600,Crop-top-surface
+Heldout,oracle_target,0.04,0.9410714285714286,33600,Oracle target
+Heldout,box_center_depth,0.06,0.7350892857142857,33600,Box-center depth
+Heldout,crop_median_depth,0.06,0.5348809523809523,33600,Crop-median depth
+Heldout,crop_top_surface,0.06,0.34625,33600,Crop-top-surface
+Heldout,oracle_target,0.06,0.9572619047619048,33600,Oracle target
+Heldout,box_center_depth,0.08,0.7621130952380952,33600,Box-center depth
+Heldout,crop_median_depth,0.08,0.8166369047619048,33600,Crop-median depth
+Heldout,crop_top_surface,0.08,0.4027678571428571,33600,Crop-top-surface
+Heldout,oracle_target,0.08,0.9709523809523808,33600,Oracle target
+Heldout,box_center_depth,0.1,0.7788690476190476,33600,Box-center depth
+Heldout,crop_median_depth,0.1,0.9197619047619048,33600,Crop-median depth
+Heldout,crop_top_surface,0.1,0.5062797619047619,33600,Crop-top-surface
+Heldout,oracle_target,0.1,0.983095238095238,33600,Oracle target

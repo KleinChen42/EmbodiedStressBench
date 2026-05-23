@@ -1,0 +1,25 @@
+name: scirep_oracle_2d_box_control_smoke
+description: Smoke gate for the Scientific Reports oracle 2D-box control run.
+env_backend: maniskill
+tasks:
+  - PickCube
+  - PickSingleYCB
+  - PickClutterYCB
+task_queries:
+  PickCube: "red cube"
+  PickSingleYCB: "target object"
+  PickClutterYCB: "target object"
+baselines:
+  - oracle_target
+  - crop_median_depth_oracle_2d_box
+  - crop_median_depth_first_detection
+  - crop_median_depth_grounding_dino
+conditions:
+  - {stressor: none, level: 0}
+  - {stressor: partial_target_occlusion, level: 3}
+seed_range:
+  start: 125
+  stop: 128
+detector_plugins:
+  - grounding_dino
+expected_episodes: 72

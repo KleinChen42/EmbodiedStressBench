@@ -1,0 +1,16 @@
+\begin{table}[t]
+\centering
+\caption{Seed-paired effect summaries for selected detector/selector comparisons. Effects are percentage-point differences in diagnostic success; intervals use 2,000 paired seed-block percentile bootstrap resamples.}
+\label{tab:paired-effects-scirep}
+\footnotesize
+\begin{tabular}{lrrr}
+\toprule
+Comparison & Effect & 95\% CI & Paired seeds \\
+\midrule
+Metadata query-aware minus GroundingDINO (crop-median, detector bridge) & 39.8 & [31.0, 47.6] & 30 \\
+Metadata query-aware minus first detection (crop-median, detector bridge) & 19.6 & [16.2, 22.7] & 30 \\
+GroundingDINO true-name minus generic query (YCB/clutter audit) & 3.8 & [-1.2, 8.8] & 20 \\
+GroundingDINO photo true-name minus generic query (YCB/clutter audit) & -2.5 & [-10.0, 3.8] & 20 \\
+\bottomrule
+\end{tabular}
+\end{table}

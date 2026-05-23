@@ -22,7 +22,7 @@ The paper should be evaluated as a reproducible diagnostic study/benchmark for q
 
 - Large-scale ManiSkill diagnostic sweeps with oracle-gap and failure taxonomy.
 - Threshold sensitivity showing a precision--robustness tradeoff: box-center is more precise at strict thresholds; crop-median is stronger at default/relaxed thresholds.
-- Open-vocabulary detector bridge using metadata-assisted selector, first detection, and GroundingDINO.
+- Learned-detector bridge using metadata-assisted selector, first detection, and one GroundingDINO plug-in.
 - YCB/clutter true-name query check showing detector-query/domain and adapter-label failure modes.
 - External YCB-V/BOP real RGB-D validation probe:
   - oracle-mask lifting: 99.97% success at 8 cm,
@@ -30,7 +30,7 @@ The paper should be evaluated as a reproducible diagnostic study/benchmark for q
   - GroundingDINO generic prompts: 23.8%,
   - GroundingDINO true object-name prompts: 61.4%.
 - Scripted closed-loop oracle-gate audit fails; it is framed only as a claim boundary/limitation.
-- Data/code are intended for GitHub release `v0.1.0-scirep` at `https://github.com/KleinChen42/EmbodiedStressBench.git` and a Zenodo DOI before final submission.
+- Data/code are archived for GitHub release `v0.1.0-scirep` at `https://github.com/KleinChen42/EmbodiedStressBench.git` with Zenodo version DOI `10.5281/zenodo.20351628`.
 
 ## What I want you to check
 
@@ -43,13 +43,13 @@ The paper should be evaluated as a reproducible diagnostic study/benchmark for q
 7. Is the failed closed-loop oracle audit correctly framed, or should execution be further de-emphasized?
 8. Are the statistical methods sufficient: confidence intervals, seed/frame-block bootstrap, threshold sensitivity, and claim boundaries?
 9. Are any major claims unsupported or too strong?
-10. Are Data Availability and Code Availability ready for Scientific Reports once the Zenodo DOI is inserted?
+10. Are Data Availability and Code Availability ready for Scientific Reports with Zenodo version DOI `10.5281/zenodo.20351628`?
 11. Are required declarations complete: Author Contributions, Competing Interests, Funding, Acknowledgements, Data Availability, Code Availability?
-12. Are figures and tables readable enough for Scientific Reports, especially Figure 1, Figure 2, Figure 5, Table 8, Table 10, and the claim-support matrix?
-13. Should any main-text table/figure move to Supplementary?
+12. Are the 5 main figures and 3 main tables readable enough for Scientific Reports, especially the protocol schematic, detector-bridge figure, external RGB-D figure, qualitative figure, and execution-audit table?
+13. Is the main-text display budget now compliant, and should any remaining main-text table/figure move to Supplementary?
 14. Are references broad and credible enough, or should key works be added/replaced?
 15. What small or medium experiment, if any, would most improve acceptance probability?
-16. Do the README, reproducibility pack, Data Availability, and Code Availability statements agree with the manuscript and avoid stale IEEE Access wording?
+16. Do the README, reproducibility pack, Data Availability, and Code Availability statements agree with the manuscript and avoid stale legacy wording?
 17. Are any GitHub/Zenodo/release-package details still too vague for Scientific Reports technical checks?
 
 ## Output requested

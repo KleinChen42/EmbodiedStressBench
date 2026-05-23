@@ -13,3 +13,8 @@ outputs/*
 paper/ieee_access/build/
 *.log
 .DS_Store
+paper*.zip
+paper/*.zip
+scientific_reports_revision_20260521/release_package*/
+scientific_reports_revision_20260521/*.zip
+scientific_reports_revision_20260521/*zip_checksums*.csv

@@ -1,53 +1,34 @@
 # Scientific Reports Result-to-Claim Gate
 
-Date: 2026-05-21
+Date: 2026-05-23
+Release DOI: 10.5281/zenodo.20351628
 
 ## Verdict
 
-The new results support a Scientific Reports manuscript centered on reproducible
-simulation diagnosis of language-to-target generation failures. They do **not**
-support a positive claim about scripted execution success calibration.
+The submitted Scientific Reports package supports a reproducible diagnostic
+study of language-to-target generation. It does not support positive claims
+about closed-loop manipulation, real-robot robustness, or detector leaderboard
+performance.
 
 ## Evidence Summary
 
-| Evidence set | Episodes | Complete | Duplicate count | Runner exceptions | Key finding |
-| --- | ---: | --- | ---: | ---: | --- |
-| Open-Vocab Bridge v2 | 13500/13500 | True | 0 | 0 | Learned detector plug-in is runnable and produces detector-specific target-generation failures |
-| YCB/clutter held-out bridge | 18000/18000 | True | 0 | 0 | Generic open-vocabulary detector transfer fails through no-detection on YCB/clutter |
-| Closed-loop smoke | 80/80 | True | 0 | 0 | Scripted executor gate failed; do not use for positive task-success claims |
-| Closed-loop oracle calibration v2 | 20/20 | True | 0 | 0 | Oracle task success remained below gate (0.100); execution calibration remains unresolved |
-
+| Evidence set | Size | Integrity | Claim use |
+| --- | ---: | --- | --- |
+| Main diagnostic sweeps and held-out extension | 134,400 held-out episodes | duplicate count 0; generated source tables | target-source and stressor diagnosis |
+| Hard-L3 confirmation | 14,400 episodes | duplicate count 0; generated source tables | failure diagnosis under hard stressors |
+| Detector-bridge sweep | 13,500 episodes | duplicate count 0; runner exceptions 0 | one learned detector plug-in plus controlled comparators |
+| YCB/clutter query checks | 960 episodes | debug fields present for learned-detector rows | query, domain, and adapter-label failure modes |
+| External YCB-V/BOP RGB-D validation | 98,567 object instances | processed source tables and frame-block CIs | external static RGB-D scope check |
+| Execution oracle-gate audit | 200 episodes | duplicate count 0; runner exceptions 0 | limitation; no positive execution-calibration claim |
 
 ## Claim Decisions
 
 | Intended claim | Verdict | Supported wording |
 | --- | --- | --- |
-| Parameterized simulation stressors expose target-generation failures | Supported | The benchmark exposes target-source and detector failure modes through controlled stressor sweeps and per-episode artifacts. |
-| Target sources show a precision-vs-robustness tradeoff | Supported | Threshold sensitivity supports a precision--robustness tradeoff; crop-median is not universally strongest under strict thresholds. |
-| Open-vocabulary detectors can be evaluated through the same protocol | Supported with scope | GroundingDINO can be evaluated through the protocol, and the YCB/clutter held-out plus query checks expose detector-query and adapter-label limitations. |
-| Diagnostic target success is informative for scripted execution success | Not supported yet | The current scripted executor smoke failed the oracle task-success gate, so execution calibration remains unresolved. |
-| Failure taxonomy separates wrong detection, invalid depth, target displacement, and execution sensitivity | Supported for diagnostic runs | Failure labels are useful for diagnosis; execution claims require a calibrated executor. |
+| Parameterized stressors expose target-generation failures | Supported | In the tested diagnostic sweeps, stressors reveal target-source-dependent failures. |
+| Target sources show a precision--robustness tradeoff | Supported | Box-center is more precise at strict thresholds; crop-median is more robust at default/relaxed thresholds. |
+| The protocol can audit a learned detector plug-in | Supported with scope | The protocol evaluates one GroundingDINO route plus metadata-assisted and first-detection comparators. |
+| External real RGB-D data reduce simulator-artifact risk | Supported with boundary | The YCB-V/BOP probe validates static RGB-D target-generation decomposition, not robot execution. |
+| Diagnostic target success predicts task success | Not supported | Scripted execution calibration remains unresolved. |
 
-## Important Negative Result
-
-In the YCB/clutter held-out bridge, GroundingDINO rows have an average
-no-detection rate of 1.000. This should be written as a limitation of
-the generic target-object query and current adapter labels, not as a general
-statement that GroundingDINO cannot work on YCB or clutter.
-
-## Query-Ablation Update
-
-The follow-up query ablation completes the prompt-sensitivity check. It removes
-the no-detection artifact but GroundingDINO remains dominated by wrong-detection
-failures on YCB/clutter. A target-name probe found no non-generic target_label
-rows, so a true object-name prompt ablation is not claimable from the current
-adapter. This supports detector-query sensitivity and adapter-metadata
-limitations rather than full object-name prompt recovery.
-
-## Manuscript Routing
-
-1. Move closed-loop execution from a positive result to a limitation and sanity
-   audit.
-2. Promote detector-transfer diagnosis to a main Scientific Reports finding.
-3. Keep all claims simulation-only and target-generation-specific.
-4. Do not add SOTA VLA, real-robot, or policy-benchmark claims.
+For the canonical release-facing claim map, use `docs/SCIREP_CLAIM_EVIDENCE.md`.

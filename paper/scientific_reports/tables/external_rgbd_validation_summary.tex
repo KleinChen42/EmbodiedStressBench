@@ -1,0 +1,20 @@
+\begin{table*}[t]
+\centering
+\caption{External real RGB-D validation on YCB-V/BOP. The visible-mask median is the 3D reference. Oracle-mask and oracle-2D-box controls isolate RGB-D lifting from detector localization, while GroundingDINO rows combine open-vocabulary 2D detection with the same target sources. Rates are percentages; success uses the default 0.08 m target-distance threshold.}
+\label{tab:external-rgbd-validation}
+\scriptsize
+\begin{tabular}{lrrrrrr}
+\toprule
+Condition & Episodes & Success (95\% CI) & Success@4 cm & Success@10 cm & Wrong det. & Median error (cm) \\
+\midrule
+Oracle mask + mask median & 98567 & 99.97 [99.96, 99.98] & 99.97 & 99.97 & 0.0 & 0.0 \\
+Oracle 2D + box-center & 98567 & 79.3 [78.9, 79.4] & 50.0 & 82.7 & 0.0 & 3.7 \\
+Oracle 2D + crop median & 98567 & 79.8 [79.6, 80.1] & 42.1 & 87.8 & 0.0 & 4.6 \\
+Oracle 2D + trimmed median & 98567 & 79.9 [79.8, 80.3] & 42.4 & 87.8 & 0.0 & 4.6 \\
+First GT box + trimmed median & 98567 & 25.3 [25.3, 26.9] & 9.9 & 33.1 & 64.6 & 14.2 \\
+DINO generic + trimmed median & 98567 & 23.8 [23.8, 25.1] & 10.1 & 30.7 & 70.3 & 14.7 \\
+DINO photo-name + trimmed median & 98567 & 46.0 [45.8, 46.4] & 22.2 & 53.5 & 39.3 & 9.1 \\
+DINO true-name + trimmed median & 98567 & 61.4 [60.8, 61.4] & 31.8 & 69.1 & 22.7 & 6.1 \\
+\bottomrule
+\end{tabular}
+\end{table*}

@@ -1,0 +1,15 @@
+\begin{table}[t]
+\centering
+\caption{GroundingDINO detector-threshold sensitivity on the full YCB-V/BOP external RGB-D probe. Rows use crop-trimmed median depth and true object-name prompts. Rates are percentages.}
+\label{tab:external-rgbd-detector-threshold}
+\scriptsize
+\begin{tabular}{lrrrr}
+\toprule
+Box/text threshold & Success (95\% CI) & No detection & Wrong detection & IoU \\
+\midrule
+0.10/0.10 & 61.5 [60.9, 61.5] & 0.00 & 22.8 & 0.670 \\
+0.20/0.20 & 61.4 [60.8, 61.4] & 0.3 & 22.7 & 0.669 \\
+0.30/0.25 & 60.0 [59.5, 60.1] & 3.1 & 21.3 & 0.656 \\
+\bottomrule
+\end{tabular}
+\end{table}

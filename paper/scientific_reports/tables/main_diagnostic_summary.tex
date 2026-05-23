@@ -1,0 +1,17 @@
+\begin{table}[t]
+\centering
+\caption{Compact diagnostic success and oracle-gap summary. Success rates are shown as percentages with 95\% seed-block percentile bootstrap confidence intervals. The held-out extension contains 134,400 episodes over 300 seed blocks, and the hard-L3 confirmation contains 14,400 episodes. Held-out oracle gap is computed against the oracle target within the held-out seed extension.}
+\label{tab:main-diagnostic-summary}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lrrr}
+\toprule
+Target source & Held-out success & Held-out oracle gap & Hard-L3 success \\
+\midrule
+Oracle target & 97.1 [96.8, 97.3] & Reference & 89.7 [88.4, 91.0] \\
+Box-center depth & 76.2 [75.1, 77.3] & 20.9 [19.8, 22.1] & 56.2 [54.4, 57.7] \\
+Crop-median depth & 81.7 [80.1, 83.2] & 15.4 [13.9, 17.0] & 74.0 [71.8, 76.1] \\
+Crop-top-surface & 40.3 [37.4, 43.1] & 56.8 [53.8, 59.7] & 33.0 [29.7, 36.1] \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -1,11 +1,10 @@
 name: open_vocab_bridge_v2
 env_backend: maniskill
 description: >
-  Open-Vocab Bridge v2 for IEEE Access revision. GroundingDINO is evaluated
-  against metadata query-aware upper comparators and first-detection lower
-  comparators across cube, YCB, and clutter tasks. YCB queries remain generic
-  unless the backend exposes specific target labels; claims should be scoped
-  accordingly.
+  Detector-bridge sweep for the Scientific Reports release. GroundingDINO is
+  evaluated against metadata query-aware upper comparators and first-detection
+  lower comparators across cube, YCB, and clutter tasks. Claims are scoped to
+  one learned detector plug-in plus controlled comparators.
 tasks:
   - PickCube
   - PickSingleYCB

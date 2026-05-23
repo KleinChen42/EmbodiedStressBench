@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+message: "If you use this software or source-data package, please cite the archived Scientific Reports release."
+title: "A reproducible diagnostic benchmark for language-to-target generation in robotic manipulation"
+authors:
+  - family-names: Chen
+    given-names: Zhuo
+    email: zhuoc@chalmers.se
+doi: 10.5281/zenodo.20351628
+url: "https://github.com/KleinChen42/EmbodiedStressBench"
+repository-code: "https://github.com/KleinChen42/EmbodiedStressBench"
+version: "v0.1.0-scirep"
+date-released: "2026-05-23"
+license: MIT
+abstract: "EmbodiedStressBench is a reproducible diagnostic benchmark for language-to-target generation and query-conditioned 3D target localization in robotic manipulation."

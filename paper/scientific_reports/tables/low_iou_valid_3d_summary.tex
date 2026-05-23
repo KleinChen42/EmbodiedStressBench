@@ -1,0 +1,18 @@
+\begin{table}[t]
+\centering
+\caption{Low-IoU but valid-3D summary for GroundingDINO rows with recorded IoU fields. Success is still evaluated by 3D target distance at the default 0.08 m threshold, so low 2D overlap can preserve valid 3D crop evidence in some cases.}
+\label{tab:low-iou-valid-3d}
+\footnotesize
+\begin{tabular}{lrrr}
+\toprule
+Evidence set & IoU bin & Episodes & 3D success \\
+\midrule
+Detector-bridge sweep & IoU $<$ 0.10 & 2640 & 0.7 \\
+Detector-bridge sweep & IoU $<$ 0.25 & 3693 & 28.1 \\
+Detector-bridge sweep & IoU $<$ 0.50 & 3873 & 30.2 \\
+YCB/clutter query audit & IoU $<$ 0.10 & 412 & 1.0 \\
+YCB/clutter query audit & IoU $<$ 0.25 & 438 & 4.1 \\
+YCB/clutter query audit & IoU $<$ 0.50 & 440 & 4.5 \\
+\bottomrule
+\end{tabular}
+\end{table}

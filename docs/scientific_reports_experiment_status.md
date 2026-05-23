@@ -1,58 +1,45 @@
 # Scientific Reports Experiment Status
 
-Date: 2026-05-21
+Date: 2026-05-23
+Release DOI: 10.5281/zenodo.20351628
 
-## Overnight Outcome
+## Submitted Evidence Sets
 
-The GPU1--3 overnight queue completed the planned evidence-gated route. The
-closed-loop smoke failed the oracle execution gate, so the queue correctly
-switched to the YCB/clutter Open-Vocab Bridge held-out fallback.
+| Evidence set | Status | Size | Paper use |
+| --- | --- | ---: | --- |
+| Main diagnostic sweeps and held-out extension | complete | 134,400 held-out episodes | target-source and stressor diagnosis |
+| Hard-L3 confirmation | complete | 14,400 episodes | hard-stressor failure diagnosis |
+| Detector-bridge sweep | complete | 13,500 episodes | one learned detector plug-in plus controlled comparators |
+| YCB/clutter query checks | complete | 960 episodes | query, domain, and adapter-label failure modes |
+| External YCB-V/BOP RGB-D validation | complete | 98,567 object instances | external static RGB-D target-generation validation |
+| Detector-threshold sweep | complete | two additional full external runs | detector-query threshold sensitivity |
+| Execution oracle-gate audit | complete | 200 episodes | limitation; no positive execution-calibration claim |
 
-| Evidence set | Status | Episodes | Duplicate results | Runner exceptions | Paper use |
-| --- | --- | ---: | ---: | ---: | --- |
-| Open-Vocab Bridge v2 | complete | 13,500/13,500 | 0 | 0 | learned-detector bridge |
-| Closed-loop sanity smoke | complete | 80/80 | 0 | 0 | audit only; gate failed |
-| YCB/clutter bridge held-out | complete | 18,000/18,000 | 0 | 0 | detector-query and adapter-label limitation |
+## Submitted Claim Decision
 
-## Key Claim Decision
-
-The Scientific Reports manuscript can support detector-agnostic target-generation
-diagnosis and open-vocabulary detector plug-in evaluation. It cannot yet support
-a positive claim that diagnostic target success predicts scripted execution
-success, because oracle task success was 0.0 in the closed-loop smoke.
+The Scientific Reports manuscript supports detector-pluggable target-generation
+diagnosis with one learned GroundingDINO route and controlled comparators. It
+does not support a positive claim that diagnostic target success predicts
+closed-loop task success. The YCB-V/BOP probe provides external static RGB-D
+support for the lifting/detector decomposition: oracle-mask lifting reaches
+99.97% success at 8 cm, oracle 2D boxes with crop-trimmed median reach 79.9%,
+GroundingDINO generic prompts reach 23.8%, and true-name prompts reach 61.4%.
 
 ## Generated Local Artifacts
 
-- `docs/scientific_reports_result_to_claim.md`
-- `docs/claim_evidence_table_scientific_reports.md`
-- `scientific_reports_revision_20260521/scirep_open_vocab_detector_transfer_combined.csv`
-- `paper/scientific_reports/tables/open_vocab_detector_transfer_summary.tex`
-- `paper/scientific_reports/tables/closed_loop_smoke_outcome.tex`
-- `paper/scientific_reports/figures/open_vocab_detector_transfer_success.png`
-- `paper/scientific_reports/figures/open_vocab_detector_transfer_no_detection.png`
-- `paper/scientific_reports/figures/maniskill_qualitative/maniskill_qualitative/maniskill_qualitative_figure.png`
-- `scientific_reports_revision_20260521/qualitative_case_manifest.csv`
+- `docs/SCIREP_CLAIM_EVIDENCE.md`
 - `paper/scientific_reports/main.tex`
+- `paper/scientific_reports/supplementary_tables.tex`
+- `paper/scientific_reports/tables/*.csv`
+- `paper/scientific_reports/tables/*.tex`
+- `paper/scientific_reports/figures/*.png`
+- `paper/scientific_reports/figures/*.pdf`
 - `scientific_reports_revision_20260521/release_package/`
-- `configs/experiments/open_vocab_query_ablation_ycb_clutter.yaml`
-
-## Completed Query-Ablation Follow-up
-
-The GroundingDINO YCB/clutter query-ablation queue completed on H200 GPU1--3.
-
-- Output root: `/data/openMythosBench_project/outputs/open_vocab_query_ablation_ycb_clutter_20260521`
-- Log: `/data/openMythosBench_project/outputs/open_vocab_query_ablation_ycb_clutter_20260521.log`
-- Analysis root: `/data/openMythosBench_project/outputs/scirep_query_ablation_20260521`
-- Query variants: generic, object-label template, category template, label phrase.
-- Completed episodes: 3,840/3,840.
-- Duplicate result count: 0.
-- Runner exceptions: 0.
-- GroundingDINO debug fields: 1,920/1,920 rows.
-- Paper interpretation: prompt variants remove the previous no-detection mode but remain dominated by wrong-detection failures; current YCB labels are still generic, so this is detector-query sensitivity plus adapter-metadata limitation, not true object-name prompt recovery.
+- `scientific_reports_revision_20260521/release_package/checksums_sha256.csv`
 
 ## Next Actions
 
 1. Compile and visually inspect `paper/scientific_reports/main.tex`.
-2. Create the GitHub release and Zenodo archive before submission.
-3. Reattempt closed-loop calibration only after a scripted executor passes the
-   oracle gate.
+2. Confirm the GitHub release and Zenodo DOI resolve to the final package.
+3. Do not add closed-loop execution claims unless a future calibrated executor
+   passes a separate oracle-gate protocol.

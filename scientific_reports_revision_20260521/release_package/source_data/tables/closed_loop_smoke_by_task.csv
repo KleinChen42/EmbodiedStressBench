@@ -1,3 +1,0 @@
-task,episodes,diagnostic_success_rate,task_success_rate,agreement_rate,mean_target_error_l2,runner_exception_rate
-PickCube,40,1.0,0.0,0.0,0.0276504127632679,0.0
-PickSingleYCB,40,0.9,0.0,0.1,0.031277373037779,0.0

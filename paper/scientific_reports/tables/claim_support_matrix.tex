@@ -1,20 +1,18 @@
-\begin{table}[t]
+\begin{table*}[t]
 \centering
-\caption{Concise claim-support matrix used to keep the Scientific Reports manuscript aligned with completed evidence. The full evidence mapping is provided in Supplementary Table S3.}
+\caption{Claim-support matrix used to keep the Scientific Reports manuscript aligned with completed evidence.}
 \label{tab:claim-support-matrix}
-\footnotesize
-\setlength{\tabcolsep}{4pt}
-\renewcommand{\arraystretch}{1.08}
-\begin{tabular}{p{0.42\linewidth}p{0.18\linewidth}p{0.30\linewidth}}
+\scriptsize
+\begin{tabular}{llll}
 \toprule
-Claim & Status & Manuscript use \\
+Claim & Evidence & Status & Manuscript use \\
 \midrule
-Parameterized stressors expose target-generation failures & Supported & Main diagnostic claim \\
-Crop-median depth is universally best & Not supported & Replaced by precision--robustness tradeoff \\
-Open-vocabulary modules can be audited by the protocol & Supported with scope & Detector-query and adapter-label failure modes \\
-GroundingDINO generally fails on YCB/clutter & Not claimed & Bounded to current query/adapter setup \\
-Diagnostic success predicts scripted task success & Not supported & Claim boundary / limitation \\
-Benchmark is real-robot validated & Not claimed & Simulation and external RGB-D only \\
+Parameterized stressors expose target-generation failures & Main sweeps + oracle-gap tables & Supported & Main diagnostic claim \\
+Crop-median depth is universally best & Threshold sensitivity & Not supported & Replaced by precision--robustness tradeoff \\
+A learned detector plug-in can be audited by the protocol & Detector-bridge sweep + YCB/clutter checks & Supported with scope & Query, domain, and adapter-label failure modes \\
+GroundingDINO generally fails on YCB/clutter & Current generic-query evidence & Not claimed & Bounded to current query/adapter setup \\
+Diagnostic success predicts scripted task success & Closed-loop oracle audit & Not supported & Claim boundary / limitation \\
+Benchmark is real-robot validated & No real-robot evidence & Not claimed & Simulation and external RGB-D only \\
 \bottomrule
 \end{tabular}
-\end{table}
+\end{table*}

@@ -17,7 +17,7 @@
 \makeatother
 \graphicspath{{\srroot/}{\srroot/figures/}}
 
-\title{EmbodiedStressBench: A Reproducible Simulation Diagnostic for Query-Conditioned 3D Target Localization in Robotic Manipulation}
+\title{A reproducible diagnostic benchmark for language-to-target generation in robotic manipulation}
 \author{Zhuo Chen\\Correspondence: \href{mailto:zhuoc@chalmers.se}{zhuoc@chalmers.se}}
 \date{}
 
@@ -25,7 +25,7 @@
 \maketitle
 
 \begin{abstract}
-Language-conditioned manipulation systems can hide target-generation failures behind aggregate task success. We present EmbodiedStressBench, a reproducible diagnostic study for stress-testing the language-query-to-3D-target stage of robotic manipulation. The study separates detection-list target selection, RGB-D target lifting, depth and occlusion corruption, and target-displacement tolerance through parameterized stressors, per-episode artifacts, oracle-gap analysis, and a failure taxonomy. Across large-scale ManiSkill diagnostic sweeps, target sources show a precision--robustness tradeoff: box-center depth is more precise under strict distance thresholds, while crop-median depth is stronger at the default and relaxed thresholds. A learned-detector bridge shows that open-vocabulary detectors can be evaluated through the same protocol, and YCB/clutter query checks expose detector-query and adapter-label failure modes without relying on positive closed-loop task-success claims. To reduce the risk of a simulation-only artifact, we additionally evaluate the same target-generation protocol on YCB-V/BOP RGB-D frames with ground-truth masks and boxes: oracle-mask lifting reaches 99.97\% success at 8 cm, oracle 2D boxes with crop-trimmed median depth reach 79.9\%, and GroundingDINO improves from 23.8\% with generic prompts to 61.4\% with true object-name prompts. A scripted closed-loop smoke test did not pass the oracle execution gate, so execution calibration is treated as an unresolved limitation. EmbodiedStressBench is therefore positioned as a detector-agnostic diagnostic substrate for reproducible query-conditioned 3D target-localization failure analysis, not as a closed-loop policy benchmark or real-robot system.
+Language-conditioned manipulation evaluations can obscure failures in converting a query into a 3D target. We present EmbodiedStressBench, a reproducible diagnostic benchmark for the language-to-target stage of robotic manipulation, separating detection-list selection, RGB-D lifting, stressor sensitivity, oracle gaps, and failure labels. In seed-controlled ManiSkill sweeps, target sources showed a threshold-dependent tradeoff: box-center depth was more precise at strict 4--6 cm thresholds, whereas crop-median depth was more robust at the default 8 cm and relaxed 10 cm thresholds. A detector-bridge analysis evaluated metadata-assisted selection, first detection, and one learned GroundingDINO plug-in through the same lifting interface, exposing query, domain, and adapter-label failure modes rather than a detector leaderboard. In the YCB-V/BOP probe, the tested GroundingDINO route improved from 23.8\% success with generic prompts to 61.4\% with true object-name prompts, while oracle-mask lifting reached 99.97\% and oracle 2D boxes with trimmed crop median reached 79.9\% at 8 cm. A scripted execution audit failed the oracle gate; therefore, the benchmark is positioned as a target-generation diagnostic, not a closed-loop policy or real-robot benchmark.
 \end{abstract}
 
 \section{Introduction}

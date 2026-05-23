@@ -1,0 +1,55 @@
+name: scirep_oracle_2d_box_control
+description: >
+  Scientific Reports external-validity preparation run. This controlled
+  simulation experiment separates detector/selector failure from RGB-D lifting
+  failure by adding oracle 2D-box controls next to metadata, first-detection,
+  and GroundingDINO selectors.
+env_backend: maniskill
+tasks:
+  - PickCube
+  - PickSingleYCB
+  - PickClutterYCB
+task_queries:
+  PickCube: "red cube"
+  PickSingleYCB: "target object"
+  PickClutterYCB: "target object"
+baselines:
+  - oracle_target
+  - box_center_depth_oracle_2d_box
+  - crop_median_depth_oracle_2d_box
+  - crop_trimmed_median_depth_oracle_2d_box
+  - box_center_depth_query_aware
+  - crop_median_depth_query_aware
+  - crop_trimmed_median_depth_query_aware
+  - box_center_depth_first_detection
+  - crop_median_depth_first_detection
+  - crop_trimmed_median_depth_first_detection
+  - box_center_depth_grounding_dino
+  - crop_median_depth_grounding_dino
+  - crop_trimmed_median_depth_grounding_dino
+conditions:
+  - {stressor: none, level: 0}
+  - {stressor: partial_target_occlusion, level: 0}
+  - {stressor: partial_target_occlusion, level: 2}
+  - {stressor: partial_target_occlusion, level: 3}
+  - {stressor: depth_sparsity, level: 0}
+  - {stressor: depth_sparsity, level: 2}
+  - {stressor: depth_sparsity, level: 3}
+  - {stressor: same_shape_distractor, level: 0}
+  - {stressor: same_shape_distractor, level: 2}
+  - {stressor: same_shape_distractor, level: 3}
+  - {stressor: same_color_distractor, level: 0}
+  - {stressor: same_color_distractor, level: 2}
+  - {stressor: same_color_distractor, level: 3}
+  - {stressor: nearby_distractor, level: 0}
+  - {stressor: nearby_distractor, level: 2}
+  - {stressor: nearby_distractor, level: 3}
+seed_range:
+  start: 125
+  stop: 185
+detector_plugins:
+  - grounding_dino
+expected_episodes: 37440
+paper_use:
+  claim: separates detector localization failure from RGB-D target lifting failure
+  primary_table: oracle 2D box control vs metadata/first/GroundingDINO selector

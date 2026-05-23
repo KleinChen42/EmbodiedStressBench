@@ -1,19 +1,18 @@
 # Scientific Reports Query-Ablation Summary
 
-Input root: `outputs\scirep_query_ablation_20260521`
+Input root: `outputs\scirep_true_name_ablation_small_20260521_r7`
 
-- Expected episodes: 3840
-- Completed episodes: 3840
+- Expected episodes: 960
+- Completed episodes: 960
 - Duplicate result count: 0
 - Runner exceptions: 0
-- GroundingDINO rows with debug fields: 1920/1920
-- Overall success rate: 0.3620
+- GroundingDINO rows with debug fields: 468/480
+- Overall success rate: 0.3396
 
 ## Interpretation
 
-The ablation removes the previous no-detection artifact but GroundingDINO remains
-dominated by wrong-detection failures on YCB/clutter. Template variants do not
-recover object-specific prompting because the current ManiSkill adapter exposes
-generic labels (`target object` / `object`) for these tasks. The paper should
-therefore claim detector-query sensitivity and adapter-metadata limitations, not
-full object-name prompt recovery.
+The ablation audits whether generic prompts, resolved true names, or true-name
+phrases change the YCB/clutter detector bridge. If GroundingDINO remains at
+high no-detection or wrong-detection rates, the paper should describe this as a
+detector-query/domain and adapter-label limitation, not as a detector leaderboard
+or a broad claim about all YCB recognition.

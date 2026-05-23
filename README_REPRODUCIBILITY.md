@@ -15,18 +15,16 @@ Author and correspondence:
 Zhuo Chen, zhuoc@chalmers.se
 ```
 
-Planned release tag:
+Release tag:
 
 ```text
 v0.1.0-scirep
 ```
 
-Zenodo DOI status:
+Zenodo DOI:
 
 ```text
-Pending. The DOI should be minted from the GitHub release before journal
-submission and then inserted into the manuscript Data Availability and Code
-Availability statements.
+10.5281/zenodo.20351628
 ```
 
 ## Canonical Manuscript Source
@@ -37,8 +35,9 @@ Compile the Scientific Reports draft from:
 paper/scientific_reports/main.tex
 ```
 
-Do not use older IEEE Access or legacy `paper/main.tex` drafts for the
-Scientific Reports submission.
+Use this source for the Scientific Reports submission. The repository root
+`paper/main.tex` mirrors this entry point only to protect against automatic
+main-file detection in Overleaf.
 
 ## Staged Release Package
 
@@ -55,7 +54,7 @@ It contains:
 - Figure source-data CSV files.
 - Generated figures used by the manuscript.
 - Configs for the completed evidence-producing runs.
-- JSON schema and reproducibility notes.
+- JSON schema, checksums, license, citation metadata, and reproducibility notes.
 - Claim-evidence and experiment-status documents.
 - Scripts for analysis, table generation, plotting, and qualitative render
   extraction.
@@ -92,12 +91,26 @@ python scripts/analyze_ycbv_external_rgbd_probe.py --help
 | Evidence set | Local/source-data artifact | Manuscript role |
 | --- | --- | --- |
 | Main ManiSkill diagnostic sweeps | generated tables and claim-evidence docs | target-source and stressor diagnosis |
-| Open-Vocab Bridge v2 | `scientific_reports_revision_20260521/release_package/source_data/` | detector plug-in audit |
-| YCB/clutter true-name query ablation | `query_ablation_summary.csv` and episode index | detector-query and adapter-label failure modes |
+| Detector-bridge sweep | `scientific_reports_revision_20260521/release_package/source_data/` | detector plug-in audit |
+| YCB/clutter true-name query ablation | `query_ablation_summary.csv` and paired-effect summaries | detector-query and adapter-label failure modes |
 | External YCB-V/BOP RGB-D validation | `external_rgbd_validation_summary.csv` | external RGB-D scope check |
 | Detector threshold sweep | `external_rgbd_detector_threshold_sensitivity.csv` | GroundingDINO threshold robustness |
 | Closed-loop oracle-gate audit | `closed_loop_oracle_calibration_v2_gate.csv` | execution-calibration claim boundary |
 | Qualitative ManiSkill renders | qualitative figure files and manifest | visual failure examples |
+
+## Figure/Table Source Mapping
+
+| Manuscript item | Source CSV/table data | Generation script |
+| --- | --- | --- |
+| Figure 1 protocol schematic | generated from manuscript protocol labels | `scripts/generate_scirep_revision_assets.py` |
+| Table 1 design summary | `paper/scientific_reports/tables/experiment_design_summary.tex` | `scripts/generate_scirep_revision_assets.py` |
+| Table 2 diagnostic summary | `main_diagnostic_summary.csv` | `scripts/generate_scirep_revision_assets.py` |
+| Figure 2 threshold tradeoff | `target_source_threshold_tradeoff_source.csv` | `scripts/generate_scirep_revision_assets.py` |
+| Figure 3 detector bridge | `scirep_open_vocab_detector_transfer_combined.csv` | `scripts/generate_scirep_revision_assets.py` |
+| Figure 4 external RGB-D validation | `external_rgbd_validation_source.csv` | `scripts/generate_scirep_external_rgbd_assets.py` |
+| Figure 5 qualitative panels | `qualitative_case_manifest.csv` | `scripts/generate_scirep_revision_assets.py` |
+| Table 3 execution audit | `closed_loop_oracle_calibration_v2_gate.csv` | `scripts/generate_scirep_revision_assets.py` |
+| Supplementary tables | `paper/scientific_reports/tables/*.csv` | `scripts/generate_scirep_revision_assets.py` and external RGB-D scripts |
 
 ## Regenerating Scientific Reports Tables And Figures
 
@@ -137,11 +150,8 @@ explicitly marked as a limitation.
 
 Before submitting to Scientific Reports:
 
-1. Commit and push the final source package to GitHub.
-2. Create release tag `v0.1.0-scirep`.
-3. Archive the release on Zenodo.
-4. Insert the minted Zenodo DOI into the manuscript Data Availability and Code
-   Availability statements.
-5. Compile and visually inspect the PDF.
-6. Confirm the PDF has no old title, internal GPU/path wording, or unsupported
+1. Confirm GitHub release tag `v0.1.0-scirep` resolves to the archived release.
+2. Confirm Zenodo DOI `10.5281/zenodo.20351628` resolves to the release archive.
+3. Compile and visually inspect the PDF.
+4. Confirm the PDF has no old title, internal GPU/path wording, or unsupported
    execution/manipulation claims.

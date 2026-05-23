@@ -1,3 +1,0 @@
-task,probe_rows,non_generic_target_label_rows,non_generic_debug_rows,most_common_target_label,true_name_ablation_allowed
-PickClutterYCB,10,0,10,target object,False
-PickSingleYCB,10,0,10,target object,False

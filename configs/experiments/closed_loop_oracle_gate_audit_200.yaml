@@ -1,0 +1,27 @@
+name: closed_loop_oracle_gate_audit_200
+description: >
+  Scientific Reports P0 oracle-gate audit. This is a negative-boundary
+  calibration run, not a positive manipulation-performance experiment.
+env_backend: maniskill
+tasks:
+  - PickCube
+  - PickSingleYCB
+task_queries:
+  PickCube: "red cube"
+  PickSingleYCB: "target object"
+baselines:
+  - oracle_target
+stressors:
+  - none
+levels:
+  - 0
+seed_range:
+  start: 0
+  stop: 100
+expected_episodes: 200
+acceptance:
+  duplicate_result_count: 0
+  runner_exception_count: 0
+  paper_use: >
+    Use only as an oracle-gate audit. Do not claim diagnostic success predicts
+    scripted task success unless task-level oracle gates pass.

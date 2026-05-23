@@ -1,16 +1,16 @@
 \begin{table}[t]
 \centering
-\caption{Closed-loop oracle calibration v2 gate. The oracle scripted executor remains below the pre-registered task-success thresholds, so no positive execution-calibration claim is made.}
+\caption{Scripted execution oracle-gate audit. The oracle scripted executor remains below the pre-registered task-success thresholds, so no positive execution-calibration claim is made. Wilson 95\% confidence intervals are reported for task success.}
 \label{tab:closed-loop-v2-gate}
 \scriptsize
-\begin{tabular}{lrr}
+\begin{tabular}{lrrl}
 \toprule
-Task & Oracle episodes & Oracle task success \\
+Task & Episodes & Task success (95\% CI) & Dominant failure \\
 \midrule
-PickCube & 10 & 10.0 \\
-PickSingleYCB & 10 & 10.0 \\
+PickCube & 100 & 2.0 [0.6, 7.0] & no grasp \\
+PickSingleYCB & 100 & 2.0 [0.6, 7.0] & no grasp \\
 \midrule
-Total & 20 & 10.0 \\
+Total & 200 & 2.0 & gate failed \\
 \bottomrule
 \end{tabular}
 \end{table}

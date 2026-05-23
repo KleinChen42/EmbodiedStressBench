@@ -1,0 +1,4 @@
+run,detector,target_source,success_rate,success_ci_low,success_ci_high,no_detection_rate,no_detection_ci_low,no_detection_ci_high,wrong_detection_rate,wrong_detection_ci_low,wrong_detection_ci_high
+open_vocab_bridge_v2,GroundingDINO,crop_median_depth,0.3148148148148148,0.29111111111111115,0.34740740740740744,0.0,0.0,0.0,0.6503703703703704,0.6066481481481483,0.6859259259259259
+open_vocab_bridge_v2,first detection,crop_median_depth,0.5170370370370371,0.4777592592592592,0.554074074074074,0.0,0.0,0.0,0.3933333333333333,0.3711111111111112,0.41777777777777786
+open_vocab_bridge_v2,metadata query-aware,crop_median_depth,0.7125925925925926,0.6451851851851853,0.774814814814815,0.0,0.0,0.0,0.10444444444444445,0.09333333333333334,0.11555555555555558

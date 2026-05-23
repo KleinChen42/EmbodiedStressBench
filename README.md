@@ -1,5 +1,7 @@
 # EmbodiedStressBench
 
+[![DOI](https://zenodo.org/badge/1237385378.svg)](https://doi.org/10.5281/zenodo.20351620)
+
 EmbodiedStressBench is a reproducible diagnostic benchmark for query-conditioned
 3D target localization in robotic manipulation. The project studies where a
 language or object query becomes an executable 3D target, separating detector or
@@ -12,8 +14,8 @@ Current manuscript target:
 
 Canonical manuscript title:
 
-> EmbodiedStressBench: A Reproducible Simulation Diagnostic for
-> Query-Conditioned 3D Target Localization in Robotic Manipulation
+> A reproducible diagnostic benchmark for language-to-target generation in
+> robotic manipulation
 
 Public repository:
 
@@ -23,9 +25,12 @@ Author and correspondence:
 
 > Zhuo Chen, zhuoc@chalmers.se
 
-The source-data release is intended to be frozen as GitHub release
-`v0.1.0-scirep` and archived with Zenodo before journal submission. The Zenodo
-DOI is intentionally not hard-coded until the author mints the archive.
+The Scientific Reports source-data release is archived as GitHub release
+`v0.1.0-scirep` with Zenodo version DOI:
+
+```text
+10.5281/zenodo.20351628
+```
 
 ## What The Paper Claims
 
@@ -35,9 +40,9 @@ Supported claims:
 - Target sources show a precision--robustness tradeoff: box-center targets are
   more precise under strict thresholds, while crop-median targets are stronger
   at the default and relaxed thresholds.
-- Open-vocabulary detector modules can be audited through the same protocol,
-  with GroundingDINO used as a scoped plug-in detector rather than as a detector
-  leaderboard.
+- One learned open-vocabulary detector plug-in can be audited through the same
+  protocol, with GroundingDINO used as a scoped plug-in detector rather than as
+  a detector leaderboard.
 - External YCB-V/BOP RGB-D validation separates RGB-D lifting controls from
   detector/query failure without claiming real-robot manipulation.
 - The scripted closed-loop oracle-gate audit fails; execution calibration is
@@ -127,6 +132,10 @@ The staged release package is:
 ```text
 scientific_reports_revision_20260521/release_package/
 ```
+
+The release package includes `LICENSE`, `CITATION.cff`, checksum metadata,
+processed source-data CSVs, figure source data, manuscript source, configs,
+schemas, and scripts needed to regenerate the submitted figures and tables.
 
 The current GitHub/Zenodo preparation checklist is:
 

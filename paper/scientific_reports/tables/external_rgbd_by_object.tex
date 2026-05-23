@@ -1,0 +1,24 @@
+\begin{table}[t]
+\centering
+\caption{External YCB-V/BOP object-level stratification excerpt. The full object-level CSV is included in the source-data release.}
+\label{tab:external-rgbd-by-object}
+\scriptsize
+\begin{tabular}{llrrr}
+\toprule
+Object & Detector/source & Episodes & Success & Median error (m) \\
+\midrule
+banana & GroundingDINO/Crop-trimmed median & 9423 & 63.6 & 0.061 \\
+banana & Oracle 2D box/Crop-trimmed median & 3141 & 84.0 & 0.050 \\
+banana & Oracle mask/Mask median depth & 3141 & 100.0 & 0.000 \\
+bleach cleanser & GroundingDINO/Crop-trimmed median & 22908 & 31.4 & 0.180 \\
+bleach cleanser & Oracle 2D box/Crop-trimmed median & 7636 & 89.0 & 0.039 \\
+bleach cleanser & Oracle mask/Mask median depth & 7636 & 100.0 & 0.000 \\
+bowl & GroundingDINO/Crop-trimmed median & 9711 & 40.7 & 0.114 \\
+bowl & Oracle 2D box/Crop-trimmed median & 3237 & 83.8 & 0.048 \\
+bowl & Oracle mask/Mask median depth & 3237 & 100.0 & 0.000 \\
+cracker box & GroundingDINO/Crop-trimmed median & 17121 & 36.7 & 0.111 \\
+cracker box & Oracle 2D box/Crop-trimmed median & 5707 & 46.4 & 0.089 \\
+cracker box & Oracle mask/Mask median depth & 5707 & 100.0 & 0.000 \\
+\bottomrule
+\end{tabular}
+\end{table}

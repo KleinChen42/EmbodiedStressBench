@@ -1,14 +1,14 @@
 \begin{table}[t]
 \centering
-\caption{YCB/clutter target-name probe. The current ManiSkill adapter exposes generic target labels, so a true object-name prompt ablation is not claimable from this probe.}
+\caption{YCB/clutter object-name resolution audit. A true object-name prompt ablation is claimable only when non-generic names are resolved from the simulator adapter.}
 \label{tab:target-name-probe}
 \scriptsize
-\begin{tabular}{lrrrl}
+\begin{tabular}{lrrl}
 \toprule
-Task & Rows & Non-generic labels & Debug rows & Common label \\
+Task & Rows & Resolved names & Example names \\
 \midrule
-PickClutterYCB & 10 & 0 & 10 & target object \\
-PickSingleYCB & 10 & 0 & 10 & target object \\
+PickClutterYCB & 20 & 20 & apple, cups, foam brick, gelatin box; ... \\
+PickSingleYCB & 20 & 20 & banana, baseball, cups, foam brick; ... \\
 \bottomrule
 \end{tabular}
 \end{table}

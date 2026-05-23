@@ -1,0 +1,29 @@
+name: open_vocab_true_name_ablation_small
+description: >
+  Gated Scientific Reports true-name prompt ablation. Run only if the deep
+  target-identity probe resolves non-generic YCB object names.
+env_backend: maniskill
+tasks:
+  - PickSingleYCB
+  - PickClutterYCB
+baselines:
+  - crop_median_depth_query_aware
+  - crop_median_depth_grounding_dino
+  - crop_trimmed_median_depth_query_aware
+  - crop_trimmed_median_depth_grounding_dino
+conditions:
+  - stressor: none
+    level: 0
+  - stressor: partial_target_occlusion
+    level: 3
+seed_range:
+  start: 105
+  stop: 125
+query_variants:
+  generic: "target object"
+  true_name: "{target_label}"
+  true_name_phrase: "a photo of {target_label}"
+expected_episodes: 960
+paper_use: >
+  If actual queries collapse to target object/object, discard this run for
+  true-name claims and report adapter-label limitations instead.
